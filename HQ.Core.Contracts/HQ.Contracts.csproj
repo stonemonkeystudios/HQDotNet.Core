@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>HQ.Contracts</AssemblyName>
+    <RootNamespace>HQ.Contracts</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Util\" />
+  </ItemGroup>
+
+</Project>
