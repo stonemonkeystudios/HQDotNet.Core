@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
-using HQ.Controllers;
-using HQ.Contracts;
+using HQ.Model;
+using HQ.View;
+using HQ.Controller;
+using HQ.Service;
 
 /* Master TODO List
  * 
@@ -15,7 +17,13 @@ using HQ.Contracts;
  * 
  */
 
-//TODO: HQ Needs to rely exclusively on states
+
+//TODO: Threading
+// -All HQBehaviors should run on their own thread.
+// -Dispatcher should dispatch to the context of the behavior
+// -Ideally services would be entirely based on ThreadPoolWorkers
+// -This means that every api needs to be its own IThreadPoolWorkerClass
+// 
 
 
 namespace HQ {
@@ -23,15 +31,17 @@ namespace HQ {
     /// <summary>
     /// HQ is a State-Driven environment structured according to a version of MVCS architecture
     /// All serializable state information is housed within the State property of <see cref="HQStateBehavior"/>
-    /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="SessionState.Behaviors"/>
+    /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="SessionModel.Behaviors"/>
     /// </summary>
     /// 
-    public class HQSession : Controller<SessionState>{
+    public class HQSession : HQController<SessionModel>{
 
         private static HQSession _current;
         private HQDispatcher _dispatcher;
         private HQInjector _injector;
-        private HQBehaviorMap _behaviorMap;
+        private HQBehaviorBindings _bindings;
+        private List<HQService> _services;
+
 
         public static HQSession Current {
             get {
@@ -40,19 +50,25 @@ namespace HQ {
         }
 
         public HQSession() {
-            State = new SessionState();
+            Model = new SessionModel();
             _dispatcher = new HQDispatcher();
             _injector = new HQInjector(this);
-            _behaviorMap = new HQBehaviorMap();
+            _bindings = new HQBehaviorBindings();
         }
 
-        public HQSession(SessionState session) {
-            State = session;
+        public HQSession(SessionModel session) {
+            Model = session;
         }
 
         public HQDispatcher Dispatcher {
             get {
-                return _current._dispatcher;
+                return _dispatcher;
+            }
+        }
+
+        public HQBehaviorBindings Bindings {
+            get {
+                return _bindings;
             }
         }
 
@@ -76,35 +92,46 @@ namespace HQ {
             return Dispatcher.Dispatch<TListener>();
         }
 
-        public TBehavior Get<TBehavior>() where TBehavior : HQStateBehavior, new() {
-            Type typeT = typeof(TBehavior);
-            return State.Get<TBehavior>();
+        public TService GetService<TService>() where TService : HQService {
+
+
         }
 
-        public TBehavior Register<TBehavior>() where TBehavior : HQStateBehavior, new(){
+        public TBehavior Get<TBehavior>() where TBehavior : HQBehavior, new() {
+            Type typeT = typeof(TBehavior);
+            return Model.Get<TBehavior>();
+        }
 
-            if (State.Contains<TBehavior>())
-                throw new ArgumentException("Behavior already registered.");
+        public TController RegisterBehavior<TController, TModel>() 
+            where TController : HQController<TModel>, new() 
+            where TModel : HQControllerModel, new(){
 
-            TBehavior newBehavior = new TBehavior();
+            Type modelType = typeof(TModel);
+            bool controllerRegistered = Model.ControllerModels.Exists((model) => { return model.GetType() == modelType; });
+            if (controllerRegistered) {
+                return Model.ControllerModels.Find((model) => { return model.GetType() == modelType; }) as TController;
+            }
 
-            State.Add<TBehavior>(newBehavior);
-            _dispatcher.RegisterBehavior(newBehavior);
+            TController newBehavior = new TController();
+
+            Model.ControllerModels.Add(newBehavior.Model);
+            _bindings.MapBehavior(newBehavior);
+            _dispatcher.Register<(newBehavior);
             _injector.InjectBehavior(newBehavior);
 
             return newBehavior;
         }
 
-        public void Unregister<TBehavior>() where TBehavior : HQStateBehavior {
-            if (State.Contains<TBehavior>()) {
-                var behavior = State.Get<TBehavior>();
+        public void Unregister<TBehavior>() where TBehavior : HQBehavior {
+            if (Model.Contains<TBehavior>()) {
+                var behavior = Model.Get<TBehavior>();
 
                 if (behavior != null)
                     behavior.Shutdown();
 
                 _dispatcher.UnregisterBehavior(behavior);
                 _injector.UninjectBehavior(behavior);
-                State.Remove<TBehavior>();
+                Model.Remove<TBehavior>();
             }
         }
 
@@ -158,19 +185,19 @@ namespace HQ {
                     allStarted &= dataSource.Startup();
             }*/
 
-            foreach (var service in State.Services.Values) {
+            foreach (var service in Model.Services.Values) {
                 if (service.State.Phase == HQPhase.Initialized)
                     allStarted &= service.Startup();
             }
 
-            foreach (var controller in State.Controllers.Values) {
+            foreach (var controller in Model.Controllers.Values) {
                 if (controller.State.Phase == HQPhase.Initialized)
                     allStarted &= controller.Startup();
             }
 
             allStarted &= base.Startup();
 
-            Dispatcher.Dispatch<ISessionListener>().PhaseUpdated(State.Phase);
+            Dispatcher.Dispatch<ISessionListener>().PhaseUpdated(Model.Phase);
 
             return allStarted;
         }
@@ -182,7 +209,7 @@ namespace HQ {
             //Run startup
             Startup();
 
-            switch (State.Phase) {
+            switch (Model.Phase) {
                 case HQPhase.Started:
 
                     //This is the main reason we have categorized, so we can set the order which they are updated
@@ -190,11 +217,11 @@ namespace HQ {
                         dataSource.Update();
                     }*/
 
-                    foreach (var service in State.Services.Values) {
+                    foreach (var service in Model.Services.Values) {
                         service.Update();
                     }
 
-                    foreach (var controller in State.Controllers.Values) {
+                    foreach (var controller in Model.Controllers.Values) {
                         controller.Update();
                     }
 
@@ -207,11 +234,11 @@ namespace HQ {
             bool allShutDown = true;
 
 
-            foreach(var controller in State.Controllers.Values){
+            foreach(var controller in Model.Controllers.Values){
                 allShutDown &= controller.Shutdown();
             }
 
-            foreach (var service in State.Services.Values) {
+            foreach (var service in Model.Services.Values) {
                 allShutDown &= service.Shutdown();
             }
 

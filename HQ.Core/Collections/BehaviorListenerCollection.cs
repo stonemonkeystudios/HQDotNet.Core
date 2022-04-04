@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using HQ.Contracts;
+using HQ.Model;
 
 namespace HQ {
     public class BehaviorListenerCollection<TBehaviorListener> : DispatchListenerCollection<TBehaviorListener>, IBehaviorListener where TBehaviorListener : IBehaviorListener{

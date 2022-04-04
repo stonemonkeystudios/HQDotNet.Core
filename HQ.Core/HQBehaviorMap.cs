@@ -1,40 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
-using HQ.Contracts;
+using HQ.Model;
 using HQ;
-using HQ.Controllers;
+using HQ.Controller;
+using HQ.Service;
+
+/*
+ * Maps to build
+ * 
+ * 
+ */
 
 namespace HQ {
-    class HQBehaviorMap : HQStateBehavior<BaseStateModel> {
-        public List<HQStateBehavior<BaseStateModel>> Behaviors { get; private set; }
-
-        private Dictionary<Type, Type> _stateToControllerMap;
-
-        public HQBehaviorMap() {
-            Behaviors = new List<HQStateBehavior<BaseStateModel>>();
-            _stateToControllerMap = new Dictionary<Type, Type>();
+    public sealed class HQBehaviorBindings : HQBehavior<HQBehaviorModel> {
+        private class HQMapModelTypeToBehavior : Dictionary<Type, HQBehavior<HQBehaviorModel>> {
+            public Type modelType;
+            public HQBehavior<HQBehaviorModel> behavior;
         }
 
-        public bool MapBehavior(HQStateBehavior<BaseStateModel> behavior) {
-            Type behaviorType = behavior.GetType();
-            Type stateType = behavior.State.GetType();
 
+        private List<HQBehavior<HQBehaviorModel>> Behaviors { get; set; }
+        private HQMapModelTypeToBehavior ModelTypeToBehaviorMap { get; set; }
+
+        public HQBehaviorBindings() {
+            Behaviors = new List<HQBehavior<HQBehaviorModel>>();
+            ModelTypeToBehaviorMap = new HQMapModelTypeToBehavior();
+        }
+
+        public bool MapBehavior(HQBehavior<HQBehaviorModel> behavior) {
+            Type modelType = behavior.Model.GetType();
+            Type behaviorType = behavior.GetType();
+
+            var mappedModels = ModelTypeToBehaviorMap.Where((mappedModel) => { return mappedModel.Value.GetType() == behaviorType});
+            if (mappedModels.Count() > 0) {
+                throw new HQException("A mapping of type '" + behaviorType + "' already exists.");
+            }
+
+            if (!ModelTypeToBehaviorMap.TryAdd(modelType, behavior)) {
+                throw new HQException("A Mapping of Type '" + modelType + "'  already exists.");
+            }
+
+
+            return true;
         }
 
         public void Remap() {
-            _stateToControllerMap = new Dictionary<Type, Type>();
+            ModelTypeToBehaviorMap.Clear();
 
             foreach(var behavior in Behaviors) {
-                Type behaviorType = behavior.GetType();
-                BehaviorCategory category = GetBehaviorCategory(behaviorType);
-                switch (category) {
-                    case BehaviorCategory.Controller:
-                        _stateToControllerMap.Add(behaviorType, behavior.State.GetType());
-                        break;
-                }
+                ModelTypeToBehaviorMap.Add(behavior.Model.GetType(), behavior);
             }
+        }
+
+        public HQBehavior<TBehaviorModel> GetBehaviorForModelType<TBehaviorModel>()
+            where TBehaviorModel : HQBehaviorModel, new() {
+
+            Type modelType = typeof(TBehaviorModel);
+            if (ModelTypeToBehaviorMap.ContainsKey(modelType))
+                return ModelTypeToBehaviorMap[modelType] as HQBehavior<TBehaviorModel>;
+
+            return null;
         }
 
         public override bool Startup(){
@@ -46,20 +74,11 @@ namespace HQ {
             if ((typeof(HQSession)).IsAssignableFrom(behaviorType))
                 return BehaviorCategory.HQ;
 
-            if ((typeof(Controller).IsAssignableFrom(behaviorType)))
+            if ((typeof(HQController<HQControllerModel>).IsAssignableFrom(behaviorType)))
                 return BehaviorCategory.Controller;
 
             if ((typeof(HQService).IsAssignableFrom(behaviorType)))
                 return BehaviorCategory.Service;
-
-            bool isDataSource = false;
-            if (behaviorType.ContainsGenericParameters) {
-                foreach (Type t in behaviorType.GenericTypeArguments) {
-                    isDataSource |= typeof(IModelData).IsAssignableFrom(t);
-                }
-            }
-            if (isDataSource)
-                return BehaviorCategory.DataSource;
 
             return BehaviorCategory.Invalid;
         }

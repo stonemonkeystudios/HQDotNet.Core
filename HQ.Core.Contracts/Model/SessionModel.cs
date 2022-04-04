@@ -5,20 +5,22 @@ using System.Collections.Generic;
 //TODO: Need an easy way to map a state to a type of controller
 //This project shouldn't really have any reference back to HQ
 
-namespace HQ.Contracts {
-    public class SessionState : ControllerState {
-        public List<ControllerState> ControllerStates { get; set; }
+namespace HQ.Model {
+    public class SessionModel : HQControllerModel {
+        public HQProjectModel Project { get; set; }
+        public List<HQControllerModel> ControllerModels { get; set; }
+        public List<HQViewModel> ViewModels { get; set; }
 
-        public SessionState() : base {
-            ControllerStates = new List<ControllerState>();
+        public SessionModel() : base {
+            ControllerModels = new List<HQControllerModel>();
         }
 
-        public SessionState(List<ControllerState> controllerStates) {
-            this.ControllerStates = controllerStates;
+        public SessionModel(List<HQControllerModel> controllerStates) {
+            this.ControllerModels = controllerStates;
         }
 
-        public SessionState(SessionState session) : base{
-            this.ControllerStates = session.ControllerStates;
+        public SessionModel(SessionModel session) : base{
+            this.ControllerModels = session.ControllerModels;
         }
  
         //[DataMember]

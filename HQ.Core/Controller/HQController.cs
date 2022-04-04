@@ -1,6 +1,6 @@
 using System;
 using HQ;
-using HQ.Contracts;
+using HQ.Model;
 
 /*
  * TODO: Set up callback system similar to the one in Data Sources.
@@ -8,15 +8,15 @@ using HQ.Contracts;
  * TODO: Should this be abstract? might currently be used by some tests, but it doesn't really do anything
  */
 
-namespace HQ.Controllers {
+namespace HQ.Controller {
 
     /// <summary>
     /// Well, a controller controls something. Data processing and such.
     /// All Singleton controllers should be registered by HQ
     /// </summary>
-    public class Controller<TControllerState> : HQStateBehavior<ControllerState> where TControllerState : ControllerState{
+    public class HQController<TControllerModel> : HQBehavior<TControllerModel> where TControllerModel : HQControllerModel, new(){
 
-        public Controller() : base() { }
+        public HQController() : base() { }
     }
 }
 

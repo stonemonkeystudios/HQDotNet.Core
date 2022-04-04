@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace HQ {
-    public class ModelDataListenerCollection : DispatchListenerCollection<IModelDataListener>, IModelDataListener {
+    public class ModelDataListenerCollection : DispatchListenerCollection<IModelListener>, IModelListener {
         /*public void OnDataAdded(Type modelType, int id) {
             this.ForEach((listener) => listener.OnDataAdded(modelType, id));
         }
@@ -13,15 +13,15 @@ namespace HQ {
         public void OnDataUpdated(Type modelType, int id) {
             this.ForEach((listener) => listener.OnDataUpdated(modelType, id));
         }*/
-        void IModelDataListener.OnDataAdded(Type modelType, int id) {
+        void IModelListener.OnDataAdded(Type modelType, int id) {
             this.ForEach((listener) => listener.OnDataAdded(modelType, id));
         }
 
-        void IModelDataListener.OnDataDeleted(Type modelType, int id) {
+        void IModelListener.OnDataDeleted(Type modelType, int id) {
             this.ForEach((listener) => listener.OnDataDeleted(modelType, id));
         }
 
-        void IModelDataListener.OnDataUpdated(Type modelType, int id) {
+        void IModelListener.OnDataUpdated(Type modelType, int id) {
             this.ForEach((listener) => listener.OnDataUpdated(modelType, id));
         }
     }

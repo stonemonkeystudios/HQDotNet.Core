@@ -1,6 +1,6 @@
 ﻿using System;;
 
-namespace HQ.Contracts {
+namespace HQ.Model {
     public class HQException : Exception {
         public HQException() {
 

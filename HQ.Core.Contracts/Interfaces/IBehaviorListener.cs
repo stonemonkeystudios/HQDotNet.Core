@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using HQ.Contracts;
+using HQ.Model;
 
 namespace HQ {
     public interface IBehaviorListener : IDispatchListener {

@@ -1,10 +1,10 @@
 using System.Runtime.Serialization;
 
-namespace HQ.Contracts {
-    public class ControllerState : BaseStateModel {
+namespace HQ.Model {
+    public class HQControllerModel : HQBehaviorModel {
         public virtual string Name { get; set; }
 
-        public ControllerState() : base() {
+        public HQControllerModel() : base() {
             Name = GetType().Name;
         }
     }

@@ -1,4 +1,4 @@
-﻿using HQ.Contracts;
+﻿using HQ.Model;
 
 namespace HQ {
     public class SessionPhaseListenerCollection : BehaviorListenerCollection<ISessionListener>, ISessionListener{

@@ -1,15 +1,10 @@
 using System.Runtime.Serialization;
+using HQ;
 
-namespace HQ.Contracts {
-    public class BaseStateModel : IExtensibleDataObject {
+namespace HQ.Model {
+    public class HQModel : HQObject, IExtensibleDataObject {
 
-        /// <summary>
-        /// Current lifecycle phase of this item.
-        /// </summary>
-        public HQPhase Phase { get; set; }
-
-        public BaseStateModel() {
-            Phase = HQPhase.Shutdown;
+        public HQModel() {
         }
 
         //For future-proofing

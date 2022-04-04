@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
-using HQ.StateMachine;
-using HQ.StateMachine.Model;
+using HQ.Model;
 
 namespace HQ
 {
@@ -16,21 +15,26 @@ namespace HQ
         }
 
         public bool InjectAll() {
-            if(_hq.State == null) {
+            if(_hq.Model == null) {
                 throw new NullReferenceException("Missing State Model, has HQ been shut down somehow?");
             }
 
             return false;
         }
 
-        public bool InjectBehavior(HQStateBehavior newBehavior) {
-            if (_hq.State == null) {
+        public bool InjectBehavior(HQBehavior<HQBehaviorModel> newBehavior) {
+            if (_hq.Model == null) {
                 throw new NullReferenceException("Missing State Model, has HQ been shut down somehow?");
             }
 
-            var behaviorList = _hq.State.GetAllBehaviors();
+            var category = HQBehaviorBindings.GetBehaviorCategory(newBehavior.GetType());
+            foreach(HQControllerModel controllerModel in _hq.Model.ControllerModels) {
+
+            }
+
+            var behaviorList = _hq.Model.GetAllBehaviors();
             foreach(var dict in behaviorList) {
-                foreach (var existingBehavior in dict.Values) {
+                foreach (var existingBehavior in _hq.Bindings) {
                     //Try injecting the new into the existing
                     Inject(existingBehavior, newBehavior);
 
@@ -42,8 +46,8 @@ namespace HQ
             return true;
         }
 
-        public void UninjectBehavior(HQStateBehavior behavior) {
-            if (_hq.State == null) {
+        public void UninjectBehavior(HQBehavior<HQBehaviorModel> behavior) {
+            if (_hq.Model == null) {
                 throw new NullReferenceException("Missing State Model, has HQ been shut down somehow?");
             }
         }
@@ -69,7 +73,7 @@ namespace HQ
             return true;
         }
 
-        private void Inject(HQStateBehavior injectee, HQStateBehavior injector) {
+        private void Inject(HQBehavior<HQBehaviorModel> injectee, HQBehavior<HQBehaviorModel> injector) {
 
             //Stop injecting yourself. Stop injecting yourself.
             if (injectee == injector)
