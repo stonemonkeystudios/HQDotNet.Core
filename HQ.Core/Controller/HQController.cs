@@ -14,7 +14,7 @@ namespace HQ.Controller {
     /// Well, a controller controls something. Data processing and such.
     /// All Singleton controllers should be registered by HQ
     /// </summary>
-    public class HQController<TControllerModel> : HQBehavior<TControllerModel> where TControllerModel : HQControllerModel, new(){
+    public class HQController<TControllerModel> : HQSingletonBehavior<TControllerModel> where TControllerModel : HQControllerModel, new(){
 
         public HQController() : base() { }
     }

@@ -1,5 +1,5 @@
 using System;
-using System.Runtime;
+using System;
 using System.Reflection;
 
 using System.Collections.Generic;
@@ -13,17 +13,29 @@ namespace HQ
      * In this case, Dispatcher could actually be a behavior and syncing would be done in the update function
      */
 
-    public class HQDispatcher : HQBehavior<HQBehaviorModel> {
-        private Dictionary<Type, IDispatchListener> _dispatchMap = new Dictionary<Type, IDispatchListener>();
-        public void Register<TCollection, TListenerType>() 
-            where TCollection : DispatchListenerCollection<TListenerType>, TListenerType, new()
-            where TListenerType : IDispatchListener {
+    public class HQDispatcher : HQSingletonBehavior<HQBehaviorModel> {
 
-            var collection = new DispatchListenerCollection<TListenerType>();
-            Type listenerType = typeof(TListenerType);
-            if (_dispatchMap.ContainsKey(listenerType))
-                throw new HQException("Dispatcher already contains a listener for type.");
+        [HQInject]
+        private HQRegistry _registry;
+        
+        public void RegisterListener<TListenerType>(TListenerType listener) 
+            where TListenerType : HQObject, IDispatchListener {
+            _registry.BindListener(listener);
+        }
 
+        public void RegisterListeners(HQObject listenerObject){
+            //Iterate all listener types on the given object
+            Type listenerType = listenerObject.GetType();
+            Type baseDispatchListenerType = typeof(IDispatchListener);
+            if (!baseDispatchListenerType.IsAssignableFrom(listenerType)) {
+                return;
+            }
+
+            Type[] interfaceTypes = listenerType.FindInterfaces(DispatchListenerFilter, listenerObject);
+            foreach(Type interfaceType in interfaceTypes) {
+                var listener = listenerObject;
+                _registry.BindListener((IDispatchListener)listenerObject);
+            }
         }
 
         public void Unregister<TListenerType>() where TListenerType : IDispatchListener {
@@ -42,6 +54,10 @@ namespace HQ
             }
 
             throw new HQException("Collection for type '" + listenerType.Name + "' should itself implement " + listenerType.Name);
+        }
+
+        private bool DispatchListenerFilter(Type type, object criteriaObject) {
+            return typeof(IDispatchListener).IsAssignableFrom(type);
         }
 
         private static bool ValidateDispatcherRules(Type interfaceType, Type behaviorType) {

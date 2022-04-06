@@ -8,7 +8,7 @@ namespace HQ.View {
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TViewModel"></typeparam>
-    public class HQView<TModel, TViewModel> : HQBehavior<HQBehaviorModel>, IViewModelListener<TViewModel>, IModelListener<TModel>
+    public class HQView<TModel, TViewModel> : HQSingletonBehavior<HQBehaviorModel>, IViewModelListener<TViewModel>, IModelListener<TModel>
         where TModel : HQModel
         where TViewModel : HQViewModel {
 

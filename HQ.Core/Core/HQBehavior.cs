@@ -6,9 +6,12 @@ namespace HQ {
     /// This is for automatic serialization of classes to subtypes.
     /// </summary>
     public abstract class HQBehavior<TModel> : HQObject
-        where TModel : HQBehaviorModel, new(){
+        where TModel : HQBehaviorModel, new() {
 
         public TModel Model { get; protected set; }
+
+        [HQInject]
+        private HQSession _session;
 
         public HQBehavior() {
             Model = new TModel();

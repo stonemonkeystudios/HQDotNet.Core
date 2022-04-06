@@ -39,7 +39,7 @@ namespace HQ {
         private static HQSession _current;
         private HQDispatcher _dispatcher;
         private HQInjector _injector;
-        private HQBehaviorBindings _bindings;
+        private HQRegistry _registry;
         private List<HQService> _services;
 
 
@@ -51,9 +51,9 @@ namespace HQ {
 
         public HQSession() {
             Model = new SessionModel();
-            _dispatcher = new HQDispatcher();
-            _injector = new HQInjector(this);
-            _bindings = new HQBehaviorBindings();
+            _registry = new HQRegistry();
+            _injector = new HQInjector();
+            _dispatcher = RegisterBehavior<HQDispatcher, HQBehaviorModel>();
         }
 
         public HQSession(SessionModel session) {
@@ -66,9 +66,9 @@ namespace HQ {
             }
         }
 
-        public HQBehaviorBindings Bindings {
+        public HQRegistry Bindings {
             get {
-                return _bindings;
+                return _registry;
             }
         }
 
@@ -92,37 +92,34 @@ namespace HQ {
             return Dispatcher.Dispatch<TListener>();
         }
 
-        public TService GetService<TService>() where TService : HQService {
-
-
-        }
-
-        public TBehavior Get<TBehavior>() where TBehavior : HQBehavior, new() {
+        public TBehavior Get<TBehavior>() where TBehavior : HQSingletonBehavior<HQBehaviorModel>, new() {
             Type typeT = typeof(TBehavior);
             return Model.Get<TBehavior>();
         }
 
-        public TController RegisterBehavior<TController, TModel>() 
-            where TController : HQController<TModel>, new() 
-            where TModel : HQControllerModel, new(){
+        public TBehavior RegisterBehavior<TBehavior, TModel>() 
+            where TBehavior : HQSingletonBehavior<TModel>, new() 
+            where TModel : HQBehaviorModel, new(){
 
             Type modelType = typeof(TModel);
-            bool controllerRegistered = Model.ControllerModels.Exists((model) => { return model.GetType() == modelType; });
+
+/*            bool controllerRegistered = Model.ControllerModels.Exists((model) => { return model.GetType() == modelType; });
             if (controllerRegistered) {
                 return Model.ControllerModels.Find((model) => { return model.GetType() == modelType; }) as TController;
-            }
+            }*/
 
-            TController newBehavior = new TController();
+            TBehavior newBehavior = new TBehavior();
+            //Model.
 
-            Model.ControllerModels.Add(newBehavior.Model);
-            _bindings.MapBehavior(newBehavior);
-            _dispatcher.Register<(newBehavior);
-            _injector.InjectBehavior(newBehavior);
+            //Model.ControllerModels.Add(newBehavior.Model);
+            _registry.BindBehavior(newBehavior as HQSingletonBehavior<HQBehaviorModel);
+            _dispatcher.RegisterListeners(newBehavior);
+            _injector.Inject(newBehavior);
 
             return newBehavior;
         }
 
-        public void Unregister<TBehavior>() where TBehavior : HQBehavior {
+        public void Unregister<TBehavior>() where TBehavior : HQSingletonBehavior {
             if (Model.Contains<TBehavior>()) {
                 var behavior = Model.Get<TBehavior>();
 
