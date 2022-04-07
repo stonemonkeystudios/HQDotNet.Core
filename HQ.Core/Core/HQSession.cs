@@ -34,7 +34,7 @@ namespace HQ {
     /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="SessionModel.Behaviors"/>
     /// </summary>
     /// 
-    public class HQSession : HQController<SessionModel>{
+    public sealed class HQSession : HQController<SessionModel>{
 
         private static HQSession _current;
         private HQDispatcher _dispatcher;
