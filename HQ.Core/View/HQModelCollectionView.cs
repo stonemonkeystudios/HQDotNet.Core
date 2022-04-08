@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using HQ.Model;
+using HQDotNet.Model;
 
-namespace HQ.View {
+namespace HQDotNet.View {
 
     /// <summary>
     /// HQView binds a given view and view model together, representing all the data
@@ -11,7 +11,7 @@ namespace HQ.View {
     /// <typeparam name="TViewModel"></typeparam>
     public class HQModelCollectionView<TModel, TViewModel, TView> : 
         HQView<TModel, TViewModel>, IModelCollectionListener<TModel>
-        where TModel : HQModel
+        where TModel : HQDataModel
         where TViewModel : HQModelCollectionViewModel
         where TView : HQView<TViewModel>
         {

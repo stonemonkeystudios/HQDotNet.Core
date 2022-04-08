@@ -1,8 +1,8 @@
 using System;
-using HQ.Model;
+using HQDotNet.Model;
 
-namespace HQ {
-    public interface IModelListener<TModelType> : IDispatchListener where TModelType : HQModel {
+namespace HQDotNet {
+    public interface IModelListener<TModelType> : IDispatchListener where TModelType : HQDataModel {
 
         void OnModelUpdated(TModelType model);
 

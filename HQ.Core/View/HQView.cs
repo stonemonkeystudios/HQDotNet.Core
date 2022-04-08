@@ -1,15 +1,15 @@
-﻿using HQ.Model;
+﻿using HQDotNet.Model;
 using System;
 
-namespace HQ.View {
+namespace HQDotNet.View {
 
     /// <summary>
     /// HQView binds a given view and view model together, representing all the data
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TViewModel"></typeparam>
-    public class HQView<TModel, TViewModel> : HQSingletonBehavior<HQBehaviorModel>, IViewModelListener<TViewModel>, IModelListener<TModel>
-        where TModel : HQModel
+    public class HQView<TModel, TViewModel> : HQCoreBehavior<HQBehaviorModel>, IViewModelListener<TViewModel>, IModelListener<TModel>
+        where TModel : HQDataModel
         where TViewModel : HQViewModel {
 
         protected bool IsDirty { get; set; }

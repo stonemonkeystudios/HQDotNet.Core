@@ -1,10 +1,10 @@
 using System.Runtime.Serialization;
-using HQ;
+using HQDotNet;
 
-namespace HQ.Model {
-    public class HQModel : HQObject, IExtensibleDataObject {
+namespace HQDotNet.Model {
+    public class HQDataModel : HQObject, IExtensibleDataObject {
 
-        public HQModel() {
+        public HQDataModel() {
         }
 
         //For future-proofing

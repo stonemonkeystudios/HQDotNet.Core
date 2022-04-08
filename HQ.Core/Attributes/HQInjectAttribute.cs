@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace HQ {
+namespace HQDotNet {
 
     /// <summary>
     /// [HQInject] is an attribute that can be used on private fields to attempt to inject various types of HQ objects into

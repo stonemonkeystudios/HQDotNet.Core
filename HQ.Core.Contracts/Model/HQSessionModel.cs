@@ -1,26 +1,27 @@
 using System.Collections.Generic;
-using HQ
+using HQDotNet
 //using HQCore.DataSources;
 //using HQCore.Models;
 
 //TODO: Need an easy way to map a state to a type of controller
 //This project shouldn't really have any reference back to HQ
 
-namespace HQ.Model {
-    public class SessionModel : HQControllerModel {
+namespace HQDotNet.Model {
+    public class HQSessionModel : HQControllerModel {
         public HQProjectModel Project { get; set; }
         public List<HQControllerModel> ControllerModels { get; set; }
         public List<HQViewModel> ViewModels { get; set; }
+        public List<HQServiceModel> ServiceModels { get; set; }
 
-        public SessionModel() : base {
+        public HQSessionModel() : base {
             ControllerModels = new List<HQControllerModel>();
         }
 
-        public SessionModel(List<HQControllerModel> controllerStates) {
+        public HQSessionModel(List<HQControllerModel> controllerStates) {
             this.ControllerModels = controllerStates;
         }
 
-        public SessionModel(SessionModel session) : base{
+        public HQSessionModel(HQSessionModel session) : base{
             this.ControllerModels = session.ControllerModels;
         }
  

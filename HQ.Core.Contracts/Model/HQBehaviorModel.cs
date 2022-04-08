@@ -1,7 +1,7 @@
 using System.Runtime.Serialization;
 
-namespace HQ.Model {
-    public class HQBehaviorModel : HQModel {
+namespace HQDotNet.Model {
+    public class HQBehaviorModel : HQDataModel {
 
         /// <summary>
         /// Current lifecycle phase of this item.

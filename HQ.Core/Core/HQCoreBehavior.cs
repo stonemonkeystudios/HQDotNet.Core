@@ -1,11 +1,11 @@
-using HQ.Model;
+using HQDotNet.Model;
 
 
-namespace HQ {
+namespace HQDotNet {
     /// <summary>
     /// This is for automatic serialization of classes to subtypes.
     /// </summary>
-    public abstract class HQBehavior<TModel> : HQObject
+    public abstract class HQCoreBehavior<TModel> : HQObject
         where TModel : HQBehaviorModel, new() {
 
         public TModel Model { get; protected set; }
@@ -13,12 +13,12 @@ namespace HQ {
         [HQInject]
         private HQSession _session;
 
-        public HQBehavior() {
+        public HQCoreBehavior() {
             Model = new TModel();
             Model.Phase = HQPhase.Initialized;
         }
 
-        public HQBehavior(TModel state) {
+        public HQCoreBehavior(TModel state) {
             Model = state;
         }
 

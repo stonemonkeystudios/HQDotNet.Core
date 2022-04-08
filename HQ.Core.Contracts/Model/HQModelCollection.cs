@@ -1,5 +1,5 @@
 ﻿
-namespace HQ.Model {
-    public class HQModelCollection<TModel> : HQModel where TModel : HQModel{
+namespace HQDotNet.Model {
+    public class HQModelCollection<TModel> : HQDataModel where TModel : HQDataModel{
     }
 }

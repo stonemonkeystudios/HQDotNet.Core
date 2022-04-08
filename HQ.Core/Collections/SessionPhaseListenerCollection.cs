@@ -1,6 +1,6 @@
-﻿using HQ.Model;
+﻿using HQDotNet.Model;
 
-namespace HQ {
+namespace HQDotNet {
     public class SessionPhaseListenerCollection : BehaviorListenerCollection<ISessionListener>, ISessionListener{
 
         void IBehaviorListener.PhaseUpdated(HQPhase phase) {

@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using HQ.Model;
-using HQ.View;
-using HQ.Controller;
-using HQ.Service;
+using HQDotNet.Model;
+using HQDotNet.View;
+using HQDotNet.Controller;
+using HQDotNet.Service;
 
-namespace HQ
+namespace HQDotNet
 {
-    public class HQInjector : HQSingletonBehavior<HQBehaviorModel> {
+    public class HQInjector : HQCoreBehavior<HQBehaviorModel> {
 
         const BindingFlags INJECT_BINDING_FLAGS = BindingFlags.NonPublic | BindingFlags.Instance;
 
-        [HQInject]
-        HQRegistry _registry;
+        private HQRegistry _registry;
 
-        public HQInjector() {
+        public void SetRegistry(HQRegistry registry) {
+            _registry = registry;
         }
 
         public bool InjectAll() {
@@ -30,7 +30,7 @@ namespace HQ
             return true;
         }
 
-        public bool Inject(HQView<HQModel, HQViewModel> newModel) {
+        public bool Inject(HQView<HQDataModel, HQViewModel> newModel) {
             return true;
         }
 
@@ -38,10 +38,10 @@ namespace HQ
             return true;
         }
 
-        public bool Inject(HQSingletonBehavior<HQBehaviorModel> newBehavior) {
-            List<HQSingletonBehavior<HQControllerModel>> controllers = _registry.GetBehaviorsForModelType<HQControllerModel>();
-            List<HQSingletonBehavior<HQViewModel>> views = _registry.GetBehaviorsForModelType<HQViewModel>();
-            List<HQSingletonBehavior<HQServiceModel>> services = _registry.GetBehaviorsForModelType<HQServiceModel>();
+        public bool Inject(HQController<HQControllerModel> newBehavior) {
+            List<HQCoreBehavior<HQControllerModel>> controllers = _registry.GetBehaviorsForModelType<HQControllerModel>();
+            List<HQView<HQDataModel,HQViewModel>> views = _registry.GetBehaviorsForModelType<HQViewModel>();
+            List<HQService<HQServiceModel>> services = _registry.GetBehaviorsForModelType<HQServiceModel>();
 
 
 
@@ -72,7 +72,7 @@ namespace HQ
             return true;
         }
 
-        public void UninjectBehavior(HQSingletonBehavior<HQBehaviorModel> behavior) {
+        public void UninjectBehavior(HQController<HQBehaviorModel> behavior) {
             if (_hq.Model == null) {
                 throw new NullReferenceException("Missing State Model, has HQ been shut down somehow?");
             }
@@ -110,7 +110,7 @@ namespace HQ
             return true;
         }
 
-        private void Inject(HQSingletonBehavior<HQBehaviorModel> injectee, HQSingletonBehavior<HQBehaviorModel> injector) {
+        private void Inject(HQController<HQBehaviorModel> injectee, HQController<HQBehaviorModel> injector) {
 
             //Stop injecting yourself. Stop injecting yourself.
             if (injectee == injector)

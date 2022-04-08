@@ -1,6 +1,6 @@
 ﻿using System;;
 
-namespace HQ.Model {
+namespace HQDotNet.Model {
     public class HQException : Exception {
         public HQException() {
 

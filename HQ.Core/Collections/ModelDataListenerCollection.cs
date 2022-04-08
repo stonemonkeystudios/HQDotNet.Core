@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HQ {
+namespace HQDotNet {
     public class ModelDataListenerCollection : DispatchListenerCollection<IModelListener>, IModelListener {
         /*public void OnDataAdded(Type modelType, int id) {
             this.ForEach((listener) => listener.OnDataAdded(modelType, id));

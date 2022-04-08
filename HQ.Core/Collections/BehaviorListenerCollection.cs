@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using HQ.Model;
+using HQDotNet.Model;
 
-namespace HQ {
+namespace HQDotNet {
     public class BehaviorListenerCollection<TBehaviorListener> : DispatchListenerCollection<TBehaviorListener>, IBehaviorListener where TBehaviorListener : IBehaviorListener{
 
         void IBehaviorListener.PhaseUpdated(HQPhase phase) {

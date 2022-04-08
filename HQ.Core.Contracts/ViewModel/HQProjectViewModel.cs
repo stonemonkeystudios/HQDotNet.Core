@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace HQ.Model {
+namespace HQDotNet.Model {
     public class HQProjectViewModel : HQViewModel {
     }
 }

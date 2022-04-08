@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HQ {
+namespace HQDotNet {
     public class DispatchListenerCollection<TDispatchListener> : List<TDispatchListener>, IDispatchListener where TDispatchListener : IDispatchListener{
 
     }

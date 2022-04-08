@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using HQ.Model;
-using HQ.View;
-using HQ.Controller;
-using HQ.Service;
+using HQDotNet.Model;
+using HQDotNet.View;
+using HQDotNet.Controller;
+using HQDotNet.Service;
 
 /* Master TODO List
  * 
@@ -26,21 +26,20 @@ using HQ.Service;
 // 
 
 
-namespace HQ {
+namespace HQDotNet {
 
     /// <summary>
     /// HQ is a State-Driven environment structured according to a version of MVCS architecture
     /// All serializable state information is housed within the State property of <see cref="HQStateBehavior"/>
-    /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="SessionModel.Behaviors"/>
+    /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="HQSessionModel.Behaviors"/>
     /// </summary>
     /// 
-    public sealed class HQSession : HQController<SessionModel>{
+    public sealed class HQSession : HQCoreBehavior<HQSessionModel>{
 
         private static HQSession _current;
         private HQDispatcher _dispatcher;
         private HQInjector _injector;
         private HQRegistry _registry;
-        private List<HQService> _services;
 
 
         public static HQSession Current {
@@ -50,13 +49,10 @@ namespace HQ {
         }
 
         public HQSession() {
-            Model = new SessionModel();
-            _registry = new HQRegistry();
-            _injector = new HQInjector();
-            _dispatcher = RegisterBehavior<HQDispatcher, HQBehaviorModel>();
+            Model = new HQSessionModel();
         }
 
-        public HQSession(SessionModel session) {
+        public HQSession(HQSessionModel session) {
             Model = session;
         }
 
@@ -78,9 +74,9 @@ namespace HQ {
         /// <returns></returns>
         public static void Init() {
             if(_current != null) {
-                Current.Shutdown();
+                throw new HQException("Current session is already running.");
             }
-            HQStateMachine.BuildKnownTypes();
+
             _current = new HQSession();
         }
 
@@ -92,13 +88,13 @@ namespace HQ {
             return Dispatcher.Dispatch<TListener>();
         }
 
-        public TBehavior Get<TBehavior>() where TBehavior : HQSingletonBehavior<HQBehaviorModel>, new() {
+        public TBehavior Get<TBehavior>() where TBehavior : HQController<HQBehaviorModel>, new() {
             Type typeT = typeof(TBehavior);
             return Model.Get<TBehavior>();
         }
 
         public TBehavior RegisterBehavior<TBehavior, TModel>() 
-            where TBehavior : HQSingletonBehavior<TModel>, new() 
+            where TBehavior : HQController<TModel>, new() 
             where TModel : HQBehaviorModel, new(){
 
             Type modelType = typeof(TModel);
@@ -112,14 +108,14 @@ namespace HQ {
             //Model.
 
             //Model.ControllerModels.Add(newBehavior.Model);
-            _registry.BindBehavior(newBehavior as HQSingletonBehavior<HQBehaviorModel);
+            _registry.BindBehavior(newBehavior as HQController<HQBehaviorModel);
             _dispatcher.RegisterListeners(newBehavior);
             _injector.Inject(newBehavior);
 
             return newBehavior;
         }
 
-        public void Unregister<TBehavior>() where TBehavior : HQSingletonBehavior {
+        public void Unregister<TBehavior>() where TBehavior : HQController {
             if (Model.Contains<TBehavior>()) {
                 var behavior = Model.Get<TBehavior>();
 
@@ -134,53 +130,24 @@ namespace HQ {
 
         #region HQBehavior Overrides
 
-        public bool LoadSettings(HQSettings[] settings) {
-            //TODO: Create an HQMasterSettings Class
-            //This can contain a list of data source settings, a list of controller settings, etc
-            throw new System.NotImplementedException("TODO");
-        }
-
         /// <summary>
-        /// Internally starts up all Registered DataSources, Services, and Controllers, in that order
-        /// Moves phase to Started
         /// </summary>
         /// <returns></returns>
         public override bool Startup() {
-            /*
-             * TODO: The order in which these are started indicates some rules
-             * -Data source Startup methods:
-             *   -CAN rely on REGISTERED/INJECTED Controllers, Services, and Sources, even if registered this frame
-             *   -CANNOT rely on Controllers, Services, or Sources being STARTED this frame
-             * -Service startup methods:
-             *   -CAN rely on REGISTERED/INJECTED Controllers, Services, and Sources, even if registered this frame
-             *  -CAN rely on sources STARTED this frame or before
-             *  -CANNOT rely on Controllers or Services being STARTED this frame
-             * -Controller Startup Methods:
-             *   -CAN rely on REGISTERED/INJECTED Controllers, Services, and Sources, even if registered this frame
-             *   CAN rely on  Sources and Services STARTED this frame or before
-             *  
-             *  RULE: Services don't talk to each other (No injection of Services
-             *  RULE: Services can talk to Data Sources
-             *  RULE: Controllers can't talk to Controllers? (No injection of controllers)
-             *  RULE: Controllers can talk to MULTIPLE Services
-             *  RULE: Controllers can't talk to Data Sources (No injection of data sources)
-             *  RULE: Controllers talk to Services, but NOT Data Sources
-             *  RULE: Data Sources can talk to Controllers
-             *  RULE: Data Sources don't talk to Services (No injection of services)
-             *  
-             *  TODO: Draw a diagram and visualize how it should work
-             * 
-             * TODO: Something to think about:
-             * Should we be able to explicitly define the startup order/script execution order?
-             * Like unity does?
-             */
 
-            bool allStarted = true;
+            //Set up our core functionality
+            _registry = new HQRegistry();
+            _injector = new HQInjector();
+            _dispatcher = RegisterBehavior<HQDispatcher, HQControllerModel>();
 
-            /*foreach(var dataSource in State.DataSources.Values) {
-                if(dataSource.State.Phase == HQPhase.Initialized)
-                    allStarted &= dataSource.Startup();
-            }*/
+            bool allStarted = _dispatcher.Startup();
+
+            //Use a method rather than injection for these
+            //Since only this class should be mediating
+            _injector.SetRegistry(_registry);
+            _dispatcher.SetRegistry(_registry);
+
+            var services = Model.
 
             foreach (var service in Model.Services.Values) {
                 if (service.State.Phase == HQPhase.Initialized)
@@ -209,16 +176,16 @@ namespace HQ {
             switch (Model.Phase) {
                 case HQPhase.Started:
 
-                    //This is the main reason we have categorized, so we can set the order which they are updated
-                    /*foreach(var dataSource in State.DataSources.Values) {
-                        dataSource.Update();
-                    }*/
 
-                    foreach (var service in Model.Services.Values) {
+
+
+
+                    foreach (var service in Model.ServiceModels) {
+                        _registry.
                         service.Update();
                     }
 
-                    foreach (var controller in Model.Controllers.Values) {
+                    foreach (var controller in Model.ControllerModels) {
                         controller.Update();
                     }
 

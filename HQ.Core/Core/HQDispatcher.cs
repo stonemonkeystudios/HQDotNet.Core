@@ -1,11 +1,7 @@
 using System;
-using System;
-using System.Reflection;
+using HQDotNet.Model;
 
-using System.Collections.Generic;
-using HQ.Model;
-
-namespace HQ
+namespace HQDotNet
 {
     /*
      * TODO: If we want to be able to thread behaviors, Dispatching should send on the main thread
@@ -13,10 +9,13 @@ namespace HQ
      * In this case, Dispatcher could actually be a behavior and syncing would be done in the update function
      */
 
-    public class HQDispatcher : HQSingletonBehavior<HQBehaviorModel> {
+    public class HQDispatcher : HQController<HQControllerModel> {
 
-        [HQInject]
         private HQRegistry _registry;
+
+        public void SetRegistry(HQRegistry registry) {
+            _registry = registry;
+        }
         
         public void RegisterListener<TListenerType>(TListenerType listener) 
             where TListenerType : HQObject, IDispatchListener {
@@ -43,17 +42,7 @@ namespace HQ
         }
 
         public TDispatchListener Dispatch<TDispatchListener>() where TDispatchListener : IDispatchListener {
-            Type listenerType = typeof(TDispatchListener);
-            if (!_dispatchMap.ContainsKey(listenerType)) {
-                throw new HQException("No listeners registered for type '" + listenerType + "'");
-            }
-
-            var collection = _dispatchMap[listenerType];
-            if (listenerType.IsAssignableFrom(collection.GetType())) {
-                return (TDispatchListener)_dispatchMap[listenerType];
-            }
-
-            throw new HQException("Collection for type '" + listenerType.Name + "' should itself implement " + listenerType.Name);
+            return (TDispatchListener)_registry.GetDispatchListenerForType<TDispatchListener>();
         }
 
         private bool DispatchListenerFilter(Type type, object criteriaObject) {

@@ -1,6 +1,6 @@
 using System;
 
-namespace HQ {
+namespace HQDotNet {
     public interface IDispatchListener{
     }
 }

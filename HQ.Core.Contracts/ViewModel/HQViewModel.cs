@@ -1,7 +1,15 @@
-using System.Runtime.Serialization;
+using HQDotNet;
 
-namespace HQ.Model {
-    public class HQViewModel : HQBehaviorModel {
+namespace HQDotNet.Model {
+    public class HQViewModel<TDataModel> : HQBehaviorModel where TDataModel : HQDataModel{
+
+        public TDataModel DataModel { get; protected set; }
+
+        //TODO: ViewModel is set up with the data model it needs to render
+        //So a view model itself needs the model to render, as views are independent?
+
+
+        //TODO: just move names to behaviors I think
         public virtual string Name { get; set; }
 
         public HQViewModel() : base() {

@@ -1,6 +1,6 @@
-﻿using HQ.Model;
+﻿using HQDotNet.Model;
 
-namespace HQ.View {
+namespace HQDotNet.View {
     public class HQProjectView : HQView<HQProjectModel, HQViewModel> {
     }
 }

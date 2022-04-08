@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HQ.Service {
+namespace HQDotNet.Service {
     class ProjectService : HQService {
     }
 }

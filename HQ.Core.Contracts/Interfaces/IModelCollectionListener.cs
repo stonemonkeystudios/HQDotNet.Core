@@ -1,7 +1,7 @@
-﻿using HQ.Model;
+﻿using HQDotNet.Model;
 
-namespace HQ {
-    public interface IModelCollectionListener<TModelType> : IDispatchListener where TModelType : HQModel {
+namespace HQDotNet {
+    public interface IModelCollectionListener<TModelType> : IDispatchListener where TModelType : HQDataModel {
 
         void OnModelAdded(TModelType model);
 
