@@ -11,11 +11,11 @@
   },
   "codeGenerators": {
     "openApiToCSharpClient": {
-      "clientBaseClass": "",
-      "configurationClass": null,
+      "clientBaseClass": "HQApi",
+      "configurationClass": "HQApiModel",
       "generateClientClasses": true,
-      "generateClientInterfaces": false,
-      "clientBaseInterface": null,
+      "generateClientInterfaces": true,
+      "clientBaseInterface": "IDispatchListener",
       "injectHttpClient": true,
       "disposeHttpClient": true,
       "protectedMethods": [],
@@ -44,13 +44,11 @@
       "className": "{controller}ApiClient",
       "operationGenerationMode": "MultipleClientsFromOperationId",
       "additionalNamespaceUsages": [
-        "HQ"
+        "HQDotNet"
       ],
-      "additionalContractNamespaceUsages": [
-        "HQ.Model"
-      ],
+      "additionalContractNamespaceUsages": [],
       "generateOptionalParameters": false,
-      "generateJsonMethods": false,
+      "generateJsonMethods": true,
       "enforceFlagEnums": false,
       "parameterArrayType": "System.Collections.Generic.IEnumerable",
       "parameterDictionaryType": "System.Collections.Generic.IDictionary",
@@ -60,7 +58,7 @@
       "wrapResponseMethods": [],
       "generateResponseClasses": true,
       "responseClass": "SwaggerResponse",
-      "namespace": "HQ.Module",
+      "namespace": "HQDotNet.Module",
       "requiredPropertiesMustBeDefined": true,
       "dateType": "System.DateTimeOffset",
       "jsonConverters": null,
@@ -124,7 +122,7 @@
       "wrapResponseMethods": [],
       "generateResponseClasses": true,
       "responseClass": "SwaggerResponse",
-      "namespace": "HQ.Module",
+      "namespace": "HQDotNet.Api",
       "requiredPropertiesMustBeDefined": true,
       "dateType": "System.DateTimeOffset",
       "jsonConverters": null,
