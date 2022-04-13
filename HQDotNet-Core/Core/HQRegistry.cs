@@ -12,7 +12,7 @@ using HQDotNet.Service;
  */
 
 namespace HQDotNet {
-    internal sealed class HQRegistry : HQController<HQRegistryModel> {
+    public sealed class HQRegistry : HQController<HQRegistryModel> {
         //public List<HQObject> Behaviors { get; private set; }
 
         public Dictionary<Type, HQController<HQControllerModel>> Controllers { get; private set; }
@@ -32,9 +32,8 @@ namespace HQDotNet {
         /// Register a singleton behavior for a type of controller 
         /// </summary>
         /// <param name="controller"></param>
-        public void RegisterController<TBehavior, TModel>(TBehavior controller)
-            where TBehavior : HQController<HQControllerModel>, new()
-            where TModel : HQControllerModel, new() {
+        public void RegisterController<TBehavior>(TBehavior controller)
+            where TBehavior : HQController<HQControllerModel>, new(){
 
             if (Controllers.ContainsKey(controller.GetType()))
                 throw new HQException("Behavior type is already registered.");

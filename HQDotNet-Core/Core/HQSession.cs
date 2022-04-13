@@ -77,12 +77,11 @@ namespace HQDotNet {
         /// Register a singleton behavior for a type of controller 
         /// </summary>
         /// <param name="controller"></param>
-        public void RegisterController<TBehavior, TModel>()
-            where TBehavior : HQController<HQControllerModel>, new()
-            where TModel : HQControllerModel, new() {
+        public void RegisterController<TBehavior>()
+            where TBehavior : HQController<HQControllerModel>, new(){
 
             TBehavior controller = new TBehavior();
-            _registry.RegisterController<TBehavior, TModel>(controller);
+            _registry.RegisterController(controller);
 
             _dispatcher.RegisterListeners(controller);
             _injector.Inject( controller);
