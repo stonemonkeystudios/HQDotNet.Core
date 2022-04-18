@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
 using HQDotNet.Model;
-using HQDotNet.View;
-using HQDotNet.Controller;
-using HQDotNet.Service;
 
 /* Master TODO List
  * 
@@ -34,7 +29,7 @@ namespace HQDotNet {
     /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="HQSessionModel.Behaviors"/>
     /// </summary>
     /// 
-    public sealed class HQSession : HQCoreBehavior<HQSessionModel>{
+    public sealed class HQSession : HQCoreBehavior{
 
         private static HQSession _current;
         private HQDispatcher _dispatcher;
@@ -46,14 +41,6 @@ namespace HQDotNet {
             get {
                 return _current;
             }
-        }
-
-        public HQSession() {
-            Model = new HQSessionModel();
-        }
-
-        public HQSession(HQSessionModel session) {
-            Model = session;
         }
 
         /// <summary>
@@ -77,58 +64,49 @@ namespace HQDotNet {
         /// Register a singleton behavior for a type of controller 
         /// </summary>
         /// <param name="controller"></param>
-        public void RegisterController<TBehavior>()
-            where TBehavior : HQController<HQControllerModel>, new(){
-
+        public TBehavior RegisterController<TBehavior>()
+            where TBehavior : HQController, new(){
+            
             TBehavior controller = new TBehavior();
-            _registry.RegisterController(controller);
+            if (!_registry.RegisterController(controller)){
+                return null;
+            }
 
             _dispatcher.RegisterListeners(controller);
             _injector.Inject( controller);
+            return controller;
         }
 
         /// <summary>
         /// Register a singleton behavior for a type of service 
         /// </summary>
         /// <param name="controller"></param>
-        public void RegisterService<TBehavior, TModel>()
-            where TBehavior : HQService<HQServiceModel>, new()
-            where TModel : HQServiceModel, new() {
+        public TBehavior RegisterService<TBehavior>()
+            where TBehavior : HQService, new(){
 
             TBehavior service = new TBehavior();
-            _registry.RegisterService<TBehavior, TModel>(service);
+            if (!_registry.RegisterService(service))
+                return null;
 
             _dispatcher.RegisterListeners(service);
             _injector.Inject(service);
+            return service;
         }
 
-        public void RegisterView<TBehavior, TModel>()
-            where TBehavior : HQView<HQDataModel, HQViewModel<HQDataModel>>, new()
-            where TModel : HQViewModel<HQDataModel>, new() {
+        public TBehavior RegisterView<TBehavior>()
+            where TBehavior : HQView, new(){
 
             TBehavior view = new TBehavior();
-            _registry.RegisterView<TBehavior, TModel>(view);
+            if (!_registry.RegisterView(view))
+                return null;
 
             _dispatcher.RegisterListeners(view);
             _injector.Inject(view);
+            return view;
         }
 
-        public void Unregister<TBehavior>() where TBehavior : HQCoreBehavior<HQCoreBehaviorModel>, new() {
-
-            //_injector.UninjectBehavior()
-            //_dispatcher.Unregister<>
-            //_registry.UnbindBehavior();
-
-            /*if (Model.Contains<TBehavior>()) {
-                var behavior = Model.Get<TBehavior>();
-
-                if (behavior != null)
-                    behavior.Shutdown();
-
-                _dispatcher.UnregisterBehavior(behavior);
-                _injector.UninjectBehavior(behavior);
-                Model.Remove<TBehavior>();
-            }*/
+        public void Unregister<TBehavior>() where TBehavior : HQCoreBehavior, new() {
+            throw new System.NotImplementedException();
         }
 
         #region HQBehavior Overrides
@@ -175,9 +153,18 @@ namespace HQDotNet {
 
             allStarted &= base.Startup();
 
-            _dispatcher.Dispatch<ISessionListener>().PhaseUpdated(Model.Phase);
+            DispatchPhaseUpdated();
 
             return allStarted;
+        }
+
+        private void DispatchPhaseUpdated() {
+            HQDispatcher.DispatchMessageDelegate<ISessionListener> dispatchMessage = 
+                (ISessionListener sessionListener) => { 
+                    return () => sessionListener.PhaseUpdated(Model.Phase); 
+                };
+
+            _dispatcher.Dispatch(dispatchMessage);
         }
 
         /// <summary>
@@ -207,6 +194,33 @@ namespace HQDotNet {
             }
 
             base.Update();
+        }
+
+        /// <summary>
+        /// Internally updates our Master Controllers
+        /// </summary>
+        public override void LateUpdate() {
+
+            if (Model.Phase == HQPhase.Started) {
+                //Servies
+                foreach (var service in _registry.Services.Values) {
+                    service.LateUpdate();
+                }
+
+                //Controllers
+                foreach (var controller in _registry.Controllers.Values) {
+                    controller.LateUpdate();
+                }
+
+                //Views
+                foreach (var viewList in _registry.Views.Values) {
+                    foreach (var view in viewList) {
+                        view.LateUpdate();
+                    }
+                }
+            }
+
+            base.LateUpdate();
         }
 
         public override bool Shutdown() {

@@ -2,25 +2,15 @@ using HQDotNet.Model;
 
 
 namespace HQDotNet {
-    /// <summary>
-    /// This is for automatic serialization of classes to subtypes.
-    /// </summary>
-    public abstract class HQCoreBehavior<TModel> : HQObject
-        where TModel : HQCoreBehaviorModel, new() {
 
-        public TModel Model { get; protected set; }
+    public abstract class HQCoreBehavior: HQObject{
+
+        protected HQCoreBehaviorModel _model = new HQCoreBehaviorModel();
+
+        public HQCoreBehaviorModel Model { get { return _model; } protected set { _model = value; } }
 
         [HQInject]
-        private HQSession _session;
-
-        public HQCoreBehavior() {
-            Model = new TModel();
-            Model.Phase = HQPhase.Initialized;
-        }
-
-        public HQCoreBehavior(TModel state) {
-            Model = state;
-        }
+        protected HQSession session;
 
         public virtual bool Shutdown() {
             Model.Phase = HQPhase.Shutdown;
@@ -34,6 +24,9 @@ namespace HQDotNet {
         }
 
         public virtual void Update() {
+        }
+
+        public virtual void LateUpdate() {
         }
     }
 }

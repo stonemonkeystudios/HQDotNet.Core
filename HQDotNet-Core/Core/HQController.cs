@@ -1,8 +1,11 @@
 ﻿using HQDotNet.Model;
 
 namespace HQDotNet {
-    public class HQController<TModel> : HQSingletonBehavior<TModel>
-        where TModel : HQControllerModel, new() {
+
+    public class HQController : HQSingletonBehavior{
+
+        [HQInject]
+        protected HQDispatcher _dispatcher;
 
     }
 }

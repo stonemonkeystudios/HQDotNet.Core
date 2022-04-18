@@ -1,5 +1,8 @@
-﻿
+﻿using System.Collections.Generic;
+
 namespace HQDotNet.Model {
-    public class HQModelCollection<TModel> : HQDataModel where TModel : HQDataModel{
+    public class HQModelCollection : HQDataModel{
+
+        public new List<HQDataModel> models;
     }
 }

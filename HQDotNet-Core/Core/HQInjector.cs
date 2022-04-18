@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HQDotNet.Model;
-using HQDotNet.View;
-using HQDotNet.Controller;
-using HQDotNet.Service;
 
 namespace HQDotNet
 {
-    internal sealed class HQInjector : HQCoreBehavior<HQCoreBehaviorModel> {
+    public sealed class HQInjector : HQCoreBehavior{
 
         //TODO: Injector flags in an injectormodel
         const BindingFlags INJECT_BINDING_FLAGS = BindingFlags.NonPublic | BindingFlags.Instance;
@@ -27,29 +24,25 @@ namespace HQDotNet
         public bool Inject(HQObject behavior){
             BehaviorCategory behaviorCategory = HQRegistry.GetBehaviorCategory(behavior.GetType());
 
-            //List<HQCoreBehavior<HQControllerModel>> controllers = _registry.GetBehaviorsForModelType<HQControllerModel>();
-            //List<HQCoreBehavior<HQViewModel<HQDataModel>>> views = _registry.GetBehaviorsForModelType<HQViewModel<HQDataModel>>();
-            //List<HQCoreBehavior<HQServiceModel>> services = _registry.GetBehaviorsForModelType<HQServiceModel>();
-
-            var x = _registry.Controllers;
-            var y = _registry.Views;
-            var z = _registry.Services;
-
             foreach(Type type in _registry.Controllers.Keys) {
                 switch (behaviorCategory) {
+                    //Controller <--> Controller
                     case BehaviorCategory.Controller:
                         Inject(behavior, _registry.Controllers[type]);
                         Inject(_registry.Controllers[type], behavior);
                         break;
+                    //Controller --> View
                     case BehaviorCategory.View:
                         Inject(behavior, _registry.Controllers[type]);
                         break;
+                    //Controller --> Service
                     case BehaviorCategory.Service:
-                        Inject(_registry.Controllers[type], behavior);
+                        //Inject(_registry.Controllers[type], behavior);
                         break;
                 }
             }
 
+            //Service -> Controller
             foreach(Type type in _registry.Services.Keys) {
                 switch (behaviorCategory) {
                     case BehaviorCategory.Controller:
@@ -58,7 +51,8 @@ namespace HQDotNet
                 }
             }
 
-            foreach (Type type in _registry.Views.Keys) {
+            
+            /*foreach (Type type in _registry.Views.Keys) {
                 foreach (var view in _registry.Views[type]) {
                     switch (behaviorCategory) {
                         case BehaviorCategory.Controller:
@@ -66,28 +60,13 @@ namespace HQDotNet
                             break;
                     }
                 }
-            }
+            }*/
 
                 return true;
         }
 
-        public void UninjectBehavior(HQCoreBehavior<HQCoreBehaviorModel> behavior) {
+        public void UninjectBehavior(HQCoreBehavior behavior) {
         }
-
-        private void BuildRuleset() {
-            Type modelType = typeof(HQController<HQControllerModel>);
-            Type controllerType = typeof(HQController<HQControllerModel>);
-            Type viewType = typeof(HQView<HQDataModel, HQViewModel<HQDataModel>>);
-            
-            _ruleset = new Dictionary<Type, List<Type>>();
-
-
-            // Injector -> Injectee
-            //Controllers
-            //_ruleset.Add(type)
-        }
-
-
 
         public bool ValidateInjectionRules(Type typeInjectee, Type typeInjector) {
 
@@ -192,7 +171,9 @@ namespace HQDotNet
 
         private bool InjectionMemberFilter(MemberInfo memberInfo, object filterCriteria) {
             Type injectorType = (Type)filterCriteria;
-            return memberInfo.ReflectedType.IsAssignableFrom(injectorType);
+            //bool success = ((FieldInfo)memberInfo).FieldType == injectorType;
+            bool success = ((FieldInfo)memberInfo).FieldType.IsAssignableFrom(injectorType);
+            return success;
         }
     }
 }

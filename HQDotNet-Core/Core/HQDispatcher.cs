@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HQDotNet.Model;
 
 namespace HQDotNet
@@ -14,9 +15,20 @@ namespace HQDotNet
      * 
      */
 
-    internal sealed class HQDispatcher : HQController<HQDispatcherModel> {
+    public sealed class HQDispatcher : HQController{
 
+        //TODO: Dispatcher should queue up all dispatches to be executed in a (new) LateUpdate method.
+        //Any other threads that need to dispatch should register here and will be dispatched later
+        //What sort of design implications does this have?
+
+        //It would be nice for these to also be immediately injectable.[HQInject]
         private HQRegistry _registry;
+
+        private Queue<Action> _pendingDispatch;
+
+        public HQDispatcher() : base() {
+            _pendingDispatch = new Queue<Action>();
+        }
 
         public void SetRegistry(HQRegistry registry) {
             _registry = registry;
@@ -46,8 +58,18 @@ namespace HQDotNet
 
         }
 
-        public TDispatchListener Dispatch<TDispatchListener>() where TDispatchListener : IDispatchListener {
-            return (TDispatchListener)_registry.GetDispatchListenerForType<TDispatchListener>();
+        public delegate Action DispatchMessageDelegate<TDispatchListener>(TDispatchListener dispatchListener);
+        public void Dispatch<TDispatchListener>(DispatchMessageDelegate<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
+
+            var listener = (TDispatchListener)_registry.GetDispatchListenerForType<TDispatchListener>();
+            _pendingDispatch.Enqueue(dispatchMessage(listener));
+        }
+
+        private void ExecuteDispatchQueue() {
+            while(_pendingDispatch.Count > 0) {
+                Action queuedAction = _pendingDispatch.Dequeue();
+                queuedAction();
+            }
         }
 
         private bool DispatchListenerFilter(Type type, object criteriaObject) {
@@ -63,7 +85,12 @@ namespace HQDotNet
             return true;
         }
 
-        public static implicit operator HQController<HQControllerModel>(HQDispatcher dispatcher) => dispatcher;
+        public override void LateUpdate() {
+
+            ExecuteDispatchQueue();
+
+            base.LateUpdate();
+        }
 
     }
 }

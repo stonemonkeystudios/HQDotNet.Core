@@ -2,6 +2,6 @@
 
 namespace HQDotNet
 {
-    public class HQSingletonBehavior<TModel> : HQCoreBehavior<TModel> where TModel : HQCoreBehaviorModel, new() {
+    public class HQSingletonBehavior: HQCoreBehavior{
     }
 }
