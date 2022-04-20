@@ -109,6 +109,12 @@ namespace HQDotNet {
             throw new System.NotImplementedException();
         }
 
+        public void Unregister(HQCoreBehavior behavior) {
+            _injector.UninjectBehavior(behavior);
+            _dispatcher.Unregister(behavior);
+            _registry.Unregister(behavior);
+        }
+
         #region HQBehavior Overrides
 
         /// <summary>
@@ -123,6 +129,8 @@ namespace HQDotNet {
 
             bool allStarted = _dispatcher.Startup();
 
+            _registry.RegisterController(_dispatcher);
+
             //Use a method rather than injection for these
             //Since only this class should be mediating
             _injector.SetRegistry(_registry);
@@ -130,14 +138,14 @@ namespace HQDotNet {
 
             //Servies
             foreach(var service in _registry.Services.Values) {
-                if(service.Model.Phase == HQPhase.Initialized) {
+                if(service.Phase == HQPhase.Initialized) {
                     allStarted &= service.Startup();
                 }
             }
 
             //Controllers
             foreach(var controller in _registry.Controllers.Values) {
-                if(controller.Model.Phase == HQPhase.Initialized) {
+                if(controller.Phase == HQPhase.Initialized) {
                     allStarted &= controller.Startup();
                 }
             }
@@ -145,7 +153,7 @@ namespace HQDotNet {
             //Views
             foreach(var viewList in _registry.Views.Values) {
                 foreach(var view in viewList) {
-                    if(view.Model.Phase == HQPhase.Initialized) {
+                    if(view.Phase == HQPhase.Initialized) {
                         allStarted &= view.Startup();
                     }
                 }
@@ -161,7 +169,7 @@ namespace HQDotNet {
         private void DispatchPhaseUpdated() {
             HQDispatcher.DispatchMessageDelegate<ISessionListener> dispatchMessage = 
                 (ISessionListener sessionListener) => { 
-                    return () => sessionListener.PhaseUpdated(Model.Phase); 
+                    return () => sessionListener.PhaseUpdated(Phase); 
                 };
 
             _dispatcher.Dispatch(dispatchMessage);
@@ -174,7 +182,7 @@ namespace HQDotNet {
             //Run startup
             Startup();
 
-            if(Model.Phase == HQPhase.Started) {
+            if(Phase == HQPhase.Started) {
                 //Servies
                 foreach (var service in _registry.Services.Values) {
                     service.Update();
@@ -201,7 +209,7 @@ namespace HQDotNet {
         /// </summary>
         public override void LateUpdate() {
 
-            if (Model.Phase == HQPhase.Started) {
+            if (Phase == HQPhase.Started) {
                 //Servies
                 foreach (var service in _registry.Services.Values) {
                     service.LateUpdate();

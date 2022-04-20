@@ -34,9 +34,9 @@ namespace HQDotNet
             _registry = registry;
         }
         
-        public void RegisterListener<TListenerType>(TListenerType listener) 
-            where TListenerType : HQObject, IDispatchListener {
-            _registry.BindListener(listener);
+        public void RegisterListener<TListener>(TListener listener) 
+            where TListener : HQObject, IDispatchListener {
+            _registry.BindListener(typeof(TListener), listener);
         }
 
         public void RegisterListeners(HQObject listenerObject){
@@ -50,19 +50,21 @@ namespace HQDotNet
             Type[] interfaceTypes = listenerType.FindInterfaces(DispatchListenerFilter, listenerObject);
             foreach(Type interfaceType in interfaceTypes) {
                 var listener = listenerObject;
-                _registry.BindListener((IDispatchListener)listenerObject);
+                _registry.BindListener(interfaceType, (IDispatchListener)listenerObject);
             }
         }
 
-        public void Unregister<TListenerType>() where TListenerType : IDispatchListener {
-
+        public void Unregister(HQCoreBehavior behavior) {
+            throw new NotImplementedException();
         }
 
         public delegate Action DispatchMessageDelegate<TDispatchListener>(TDispatchListener dispatchListener);
         public void Dispatch<TDispatchListener>(DispatchMessageDelegate<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
 
-            var listener = (TDispatchListener)_registry.GetDispatchListenerForType<TDispatchListener>();
-            _pendingDispatch.Enqueue(dispatchMessage(listener));
+            var listeners = _registry.GetDispatchListenersForType<TDispatchListener>();
+            foreach(var listener in listeners) {
+                _pendingDispatch.Enqueue(dispatchMessage((TDispatchListener)listener));
+            }
         }
 
         private void ExecuteDispatchQueue() {

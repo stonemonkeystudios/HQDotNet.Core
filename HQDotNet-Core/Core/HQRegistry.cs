@@ -16,14 +16,14 @@ namespace HQDotNet {
         public Dictionary<Type, HQService> Services { get; private set; }
         public Dictionary<Type, List<HQView>> Views { get; private set; }
 
-        private Dictionary<Type, DispatchListenerCollection<IDispatchListener>> _dispatcherBinding;
+        private Dictionary<Type, List<IDispatchListener>> _dispatcherBinding;
 
         public HQRegistry() : base() {
 
             Controllers = new Dictionary<Type, HQController>();
             Services = new Dictionary<Type, HQService>();
             Views = new Dictionary<Type, List<HQView>>();
-            _dispatcherBinding = new Dictionary<Type, DispatchListenerCollection<IDispatchListener>>();
+            _dispatcherBinding = new Dictionary<Type, List<IDispatchListener>>();
         }
 
         /// <summary>
@@ -68,14 +68,20 @@ namespace HQDotNet {
             return true;
         }
 
-        public void BindListener <TListenerBehavior>(TListenerBehavior behavior) where TListenerBehavior : IDispatchListener {
-            Type listenerType = typeof(TListenerBehavior);
+        public bool Unregister(HQCoreBehavior behavior) {
+            throw new NotImplementedException();
+        }
 
-            if (!_dispatcherBinding.ContainsKey(listenerType)) {
-                _dispatcherBinding.Add(listenerType, new DispatchListenerCollection<IDispatchListener>());
+        public void BindListener <TListenerBehavior>(Type type, TListenerBehavior behavior) where TListenerBehavior : IDispatchListener {
+            //Type listenerType = typeof(TListenerBehavior);
+
+            if (!_dispatcherBinding.ContainsKey(type)) {
+                _dispatcherBinding.Add(type, new List<IDispatchListener>());
             }
 
-            _dispatcherBinding[listenerType].Add(behavior);
+            if (!_dispatcherBinding[type].Contains(behavior)) {
+                _dispatcherBinding[type].Add(behavior);
+            }
         }
 
         public static BehaviorCategory GetBehaviorCategory(Type behaviorType) {
@@ -97,7 +103,7 @@ namespace HQDotNet {
 
         #region Dispatcher Bindings
 
-        public IDispatchListener GetDispatchListenerForType<TDispatchListener>()
+        public List<IDispatchListener> GetDispatchListenersForType<TDispatchListener>()
             where TDispatchListener : IDispatchListener{
 
             Type listenerType = typeof(TDispatchListener);
@@ -105,7 +111,7 @@ namespace HQDotNet {
             if (_dispatcherBinding.ContainsKey(listenerType)) {
                 return _dispatcherBinding[listenerType];
             }
-            return new DispatchListenerCollection<TDispatchListener>();
+            return new List<IDispatchListener>();
         }
 
         #endregion;

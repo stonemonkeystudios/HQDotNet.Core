@@ -4,8 +4,8 @@ using System.Reflection;
 namespace HQDotNet {
 
     /// <summary>
-    /// [HQInject] is an attribute that can be used on private fields to attempt to inject various types of HQ objects into
-    /// Currently supported objects are DataSource<IDataStore> and Controller.
+    /// [HQInject] is an attribute to be used for private fields on an HQBehavior
+    /// It indicates to HQ that we should attempt to inject a registered behavior into the variable
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class HQInject : Attribute {

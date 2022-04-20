@@ -13,7 +13,8 @@ namespace HQDotNet.Test {
         }
 
         void IModelListener<DummyData>.OnModelUpdated(DummyData model) {
-            System.Console.WriteLine("OnModelUpdated DummyModel: " + model.title);
+            //System.Console.WriteLine("OnModelUpdated DummyModel: " + model.title);
+            DisplayString = model.title;
         }
     }
 }

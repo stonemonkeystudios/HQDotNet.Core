@@ -4,16 +4,28 @@ using System.Threading.Tasks;
 
 namespace HQDotNet.Test {
     public class DummyModuleService : HQService{
-        public void AsyncDummyServiceCall(Action<DummyData> dataRetrievedCallback) {
-            Busywork(dataRetrievedCallback);
+
+        public async Task AsyncDummyDelayedServiceCall(string newTitle, Action<DummyData> dataRetrievedCallback) {
+            await Busywork(newTitle, dataRetrievedCallback);
         }
 
-        private async void Busywork(Action<DummyData> dataRetrievedCallback) {
-            await Task.Run(BackroundThreadBusyWork).ContinueWith((task) => dataRetrievedCallback);
+        public async Task AsyncDummyImmediateServiceCall(string newTitle, Action<DummyData> dataRetrievedCallback) {
+            await BusyworkImmediate(newTitle, dataRetrievedCallback);
+        }
+
+        private async Task Busywork(string newTitle, Action<DummyData> dataRetrievedCallback) {
+            await Task.Run(BackroundThreadBusyWork).ContinueWith((task) => dataRetrievedCallback(new DummyData() { title = newTitle }));
         }
 
         private void BackroundThreadBusyWork() {
-            Thread.Sleep(100);
+            Thread.Sleep(50);
+        }
+
+        private async Task BusyworkImmediate(string newTitle, Action<DummyData> dataRetrievedCallback) {
+            await Task.Run(BackroundThreadBusyWorkImmediate).ContinueWith((task) => dataRetrievedCallback(new DummyData() { title = newTitle }));
+        }
+
+        private void BackroundThreadBusyWorkImmediate() {
         }
     }
 }

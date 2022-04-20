@@ -37,7 +37,7 @@ namespace HQDotNet
                         break;
                     //Controller --> Service
                     case BehaviorCategory.Service:
-                        //Inject(_registry.Controllers[type], behavior);
+                        Inject(_registry.Controllers[type], behavior);
                         break;
                 }
             }

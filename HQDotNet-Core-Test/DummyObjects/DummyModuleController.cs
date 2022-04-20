@@ -1,4 +1,4 @@
-﻿using HQDotNet.Model;
+﻿using System.Threading.Tasks;
 
 namespace HQDotNet.Test {
     public class DummyModuleController: HQController {
@@ -17,8 +17,12 @@ namespace HQDotNet.Test {
             return _controller2 != null;
         }
 
-        public void QueryDummyServiceForData() {
-            _service.AsyncDummyServiceCall(DataReceived);
+        public async Task QueryDummyDelayedServiceForData(string newTitle) {
+            await _service.AsyncDummyDelayedServiceCall(newTitle, DataReceived);
+        }
+
+        public async Task QueryDummyImmediateServiceForData(string newTitle) {
+            await _service.AsyncDummyImmediateServiceCall(newTitle, DataReceived);
         }
 
         private void DataReceived(DummyData data) {
