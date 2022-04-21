@@ -66,6 +66,56 @@ namespace HQDotNet
         }
 
         public void UninjectBehavior(HQCoreBehavior behavior) {
+            Type injectorType = behavior.GetType();
+
+            //Iterate every known behavior
+
+            //If there is a field with this behavior assigned, then set that behavior variable to null
+            foreach (var controllerType in _registry.Controllers.Keys) {
+                var controller = _registry.Controllers[controllerType];
+                MemberFilter filter = new MemberFilter(InjectionMemberFilter);
+
+                //Find all fields of the given type on injectee
+                //Remove any
+                MemberInfo[] injectableMembers = controller.GetType().FindMembers(MemberTypes.Field, INJECT_BINDING_FLAGS, filter, injectorType);
+                foreach (MemberInfo member in injectableMembers) {
+                    if(member.GetCustomAttribute<HQInject>() == null) {
+                        continue;
+                    }
+                    (member as FieldInfo).SetValue(controller, null);
+                }
+            }
+
+            foreach (var serviceType in _registry.Services.Keys) {
+                var service = _registry.Services[serviceType];
+                MemberFilter filter = new MemberFilter(InjectionMemberFilter);
+
+                //Find all fields of the given type on injectee
+                //Remove any
+                MemberInfo[] injectableMembers = service.GetType().FindMembers(MemberTypes.Field, INJECT_BINDING_FLAGS, filter, injectorType);
+                foreach (MemberInfo member in injectableMembers) {
+                    if (member.GetCustomAttribute<HQInject>() == null) {
+                        continue;
+                    }
+                    (member as FieldInfo).SetValue(service, null);
+                }
+            }
+
+            foreach (var viewType in _registry.Views.Keys) {
+                foreach (var view in _registry.Views[viewType]) {
+                    MemberFilter filter = new MemberFilter(InjectionMemberFilter);
+
+                    //Find all fields of the given type on injectee
+                    //Remove any
+                    MemberInfo[] injectableMembers = view.GetType().FindMembers(MemberTypes.Field, INJECT_BINDING_FLAGS, filter, injectorType);
+                    foreach (MemberInfo member in injectableMembers) {
+                        if (member.GetCustomAttribute<HQInject>() == null) {
+                            continue;
+                        }
+                        (member as FieldInfo).SetValue(view, null);
+                    }
+                }
+            }
         }
 
         public bool ValidateInjectionRules(Type typeInjectee, Type typeInjector) {

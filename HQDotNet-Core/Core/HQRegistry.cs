@@ -10,7 +10,7 @@ using HQDotNet.Model;
  */
 
 namespace HQDotNet {
-    public sealed class HQRegistry : HQController{
+    public sealed class HQRegistry : HQCoreBehavior{
 
         public Dictionary<Type, HQController> Controllers { get; private set; }
         public Dictionary<Type, HQService> Services { get; private set; }
@@ -68,8 +68,25 @@ namespace HQDotNet {
             return true;
         }
 
-        public bool Unregister(HQCoreBehavior behavior) {
-            throw new NotImplementedException();
+        public void Unregister(HQCoreBehavior behavior) {
+            var category = GetBehaviorCategory(behavior.GetType());
+            switch (category) {
+                case BehaviorCategory.Controller:
+                    if (Controllers.ContainsKey(behavior.GetType())) {
+                        Controllers.Remove(behavior.GetType());
+                    }
+                    break;
+                case BehaviorCategory.Service:
+                    if (Services.ContainsKey(behavior.GetType())) {
+                        Services.Remove(behavior.GetType());
+                    }
+                    break;
+                case BehaviorCategory.View:
+                    if (Views.ContainsKey(behavior.GetType())) {
+                        Views.Remove(behavior.GetType());
+                    }
+                    break;
+            }
         }
 
         public void BindListener <TListenerBehavior>(Type type, TListenerBehavior behavior) where TListenerBehavior : IDispatchListener {
@@ -81,6 +98,20 @@ namespace HQDotNet {
 
             if (!_dispatcherBinding[type].Contains(behavior)) {
                 _dispatcherBinding[type].Add(behavior);
+            }
+        }
+
+        public void UnbindAllDispatchListenersForType(Type listenerType) {
+            if (_dispatcherBinding.ContainsKey(listenerType)) {
+                _dispatcherBinding.Remove(listenerType);
+            }
+        }
+
+        public void UnbindBehaviorListenerForObject <TListenerBehavior>(Type type, TListenerBehavior behavior) where TListenerBehavior : IDispatchListener {
+            if (_dispatcherBinding.ContainsKey(type)) {
+                if (_dispatcherBinding[type].Contains(behavior)) {
+                    _dispatcherBinding[type].Remove(behavior);
+                }
             }
         }
 

@@ -63,5 +63,9 @@ namespace HQDotNet.Test {
             }
 
         }
+
+        public void UnregisterControllerTest() {
+
+        }
     }
 }

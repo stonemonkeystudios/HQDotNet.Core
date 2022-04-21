@@ -36,7 +36,7 @@ namespace HQDotNet.Test {
         }
 
         [Test]
-        public async Task SimpleListenerTest() {
+        public async Task DelayedServiceDispatchTest() {
             DummyModuleView view = new DummyModuleView();
             DummyModuleController controller = new DummyModuleController();
             DummyModuleService service = new DummyModuleService();
@@ -51,9 +51,9 @@ namespace HQDotNet.Test {
             _injector.Inject(view);
             _injector.Inject(service);
 
-            _dispatcher.RegisterListeners(controller);
-            _dispatcher.RegisterListeners(view);
-            _dispatcher.RegisterListeners(service);
+            _dispatcher.RegisterDispatchListenersForObject(controller);
+            _dispatcher.RegisterDispatchListenersForObject(view);
+            _dispatcher.RegisterDispatchListenersForObject(service);
 
             Assert.IsNull(view.DisplayString);
             Assert.True(controller.HasService());
@@ -61,6 +61,38 @@ namespace HQDotNet.Test {
             string dummyTitleString = "DummyTitle";
 
             await controller.QueryDummyDelayedServiceForData(dummyTitleString);
+
+            _dispatcher.LateUpdate();
+
+            Assert.AreEqual(dummyTitleString, view.DisplayString);
+        }
+
+        [Test]
+        public async Task ImmediateServiceDispatchTest() {
+            DummyModuleView view = new DummyModuleView();
+            DummyModuleController controller = new DummyModuleController();
+            DummyModuleService service = new DummyModuleService();
+
+            _registry.RegisterController(_dispatcher);
+
+            _registry.RegisterController(controller);
+            _registry.RegisterView(view);
+            _registry.RegisterService(service);
+
+            _injector.Inject(controller);
+            _injector.Inject(view);
+            _injector.Inject(service);
+
+            _dispatcher.RegisterDispatchListenersForObject(controller);
+            _dispatcher.RegisterDispatchListenersForObject(view);
+            _dispatcher.RegisterDispatchListenersForObject(service);
+
+            Assert.IsNull(view.DisplayString);
+            Assert.True(controller.HasService());
+
+            string dummyTitleString = "DummyTitle";
+
+            await controller.QueryDummyImmediateServiceForData(dummyTitleString);
 
             _dispatcher.LateUpdate();
 

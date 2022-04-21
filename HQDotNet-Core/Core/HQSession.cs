@@ -72,7 +72,7 @@ namespace HQDotNet {
                 return null;
             }
 
-            _dispatcher.RegisterListeners(controller);
+            _dispatcher.RegisterDispatchListenersForObject(controller);
             _injector.Inject( controller);
             return controller;
         }
@@ -88,7 +88,7 @@ namespace HQDotNet {
             if (!_registry.RegisterService(service))
                 return null;
 
-            _dispatcher.RegisterListeners(service);
+            _dispatcher.RegisterDispatchListenersForObject(service);
             _injector.Inject(service);
             return service;
         }
@@ -100,7 +100,7 @@ namespace HQDotNet {
             if (!_registry.RegisterView(view))
                 return null;
 
-            _dispatcher.RegisterListeners(view);
+            _dispatcher.RegisterDispatchListenersForObject(view);
             _injector.Inject(view);
             return view;
         }
@@ -111,7 +111,7 @@ namespace HQDotNet {
 
         public void Unregister(HQCoreBehavior behavior) {
             _injector.UninjectBehavior(behavior);
-            _dispatcher.Unregister(behavior);
+            _dispatcher.UnregisterDispatchListenersForObject(behavior);
             _registry.Unregister(behavior);
         }
 

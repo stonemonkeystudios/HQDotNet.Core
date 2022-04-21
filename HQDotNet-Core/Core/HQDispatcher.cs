@@ -33,13 +33,8 @@ namespace HQDotNet
         public void SetRegistry(HQRegistry registry) {
             _registry = registry;
         }
-        
-        public void RegisterListener<TListener>(TListener listener) 
-            where TListener : HQObject, IDispatchListener {
-            _registry.BindListener(typeof(TListener), listener);
-        }
 
-        public void RegisterListeners(HQObject listenerObject){
+        public void RegisterDispatchListenersForObject(HQObject listenerObject){
             //Iterate all listener types on the given object
             Type listenerType = listenerObject.GetType();
             Type baseDispatchListenerType = typeof(IDispatchListener);
@@ -54,8 +49,24 @@ namespace HQDotNet
             }
         }
 
-        public void Unregister(HQCoreBehavior behavior) {
-            throw new NotImplementedException();
+        public void UnregisterDispatchListenersForObject(HQObject listenerObject) {
+            //Iterate all listener types on the given object
+            Type listenerType = listenerObject.GetType();
+            Type baseDispatchListenerType = typeof(IDispatchListener);
+            if (!baseDispatchListenerType.IsAssignableFrom(listenerType)) {
+                return;
+            }
+
+            Type[] interfaceTypes = listenerType.FindInterfaces(DispatchListenerFilter, listenerObject);
+            foreach (Type interfaceType in interfaceTypes) {
+                var listener = listenerObject;
+                _registry.UnbindBehaviorListenerForObject(interfaceType, (IDispatchListener)listenerObject);
+            }
+        }
+
+        public void UnregisterDispatchListenerInterface<TListener>(TListener listener)
+            where TListener : HQObject, IDispatchListener {
+            _registry.UnbindAllDispatchListenersForType(typeof(TListener));
         }
 
         public delegate Action DispatchMessageDelegate<TDispatchListener>(TDispatchListener dispatchListener);
