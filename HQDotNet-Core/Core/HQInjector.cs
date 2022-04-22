@@ -35,8 +35,9 @@ namespace HQDotNet
                     case BehaviorCategory.View:
                         Inject(behavior, _registry.Controllers[type]);
                         break;
-                    //Controller --> Service
+                    //Controller <--> Service
                     case BehaviorCategory.Service:
+                        Inject(behavior, _registry.Controllers[type]);
                         Inject(_registry.Controllers[type], behavior);
                         break;
                 }
@@ -47,6 +48,7 @@ namespace HQDotNet
                 switch (behaviorCategory) {
                     case BehaviorCategory.Controller:
                         Inject(behavior, _registry.Services[type]);
+                        Inject(_registry.Services[type], behavior);
                         break;
                 }
             }

@@ -1,9 +1,9 @@
-using System.Runtime.Serialization;
+//using System.Runtime.Serialization;
 using HQDotNet;
 
 namespace HQDotNet.Model {
 
-    public class HQDataModel : HQObject, IExtensibleDataObject {
+    public class HQDataModel : HQObject{//, IExtensibleDataObject {
 
         //Use IsDirty in combination with Dispatch Attribute and dispatcher to automatically dispatch updates
         public bool IsDirty { get;}
@@ -15,7 +15,7 @@ namespace HQDotNet.Model {
 
 
 
-
+        /*
         //For future-proofing
         protected ExtensionDataObject _extensionDataObject;
 
@@ -26,6 +26,6 @@ namespace HQDotNet.Model {
             set {
                 _extensionDataObject = value;
             }
-        }
+        }*/
     }
 }

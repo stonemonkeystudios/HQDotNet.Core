@@ -1,9 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
     <AssemblyName>HQDotNet.Model</AssemblyName>
     <RootNamespace>HQDotNet.Model</RootNamespace>
+    <Configurations>Debug;Release;UnityRelease</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityRelease|AnyCPU'">
+    <OutputPath>$(SolutionDir)Release\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='UnityRelease|netstandard2.1|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

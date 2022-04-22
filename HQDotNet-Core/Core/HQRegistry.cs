@@ -14,6 +14,7 @@ namespace HQDotNet {
 
         public Dictionary<Type, HQController> Controllers { get; private set; }
         public Dictionary<Type, HQService> Services { get; private set; }
+
         public Dictionary<Type, List<HQView>> Views { get; private set; }
 
         private Dictionary<Type, List<IDispatchListener>> _dispatcherBinding;
@@ -89,15 +90,15 @@ namespace HQDotNet {
             }
         }
 
-        public void BindListener <TListenerBehavior>(Type type, TListenerBehavior behavior) where TListenerBehavior : IDispatchListener {
+        public void BindListener <TObjectListener>(Type type, TObjectListener listenerObject) where TObjectListener : IDispatchListener{
             //Type listenerType = typeof(TListenerBehavior);
 
             if (!_dispatcherBinding.ContainsKey(type)) {
                 _dispatcherBinding.Add(type, new List<IDispatchListener>());
             }
 
-            if (!_dispatcherBinding[type].Contains(behavior)) {
-                _dispatcherBinding[type].Add(behavior);
+            if (!_dispatcherBinding[type].Contains(listenerObject)) {
+                _dispatcherBinding[type].Add(listenerObject);
             }
         }
 
@@ -117,7 +118,7 @@ namespace HQDotNet {
 
         public static BehaviorCategory GetBehaviorCategory(Type behaviorType) {
             if ((typeof(HQSession)).IsAssignableFrom(behaviorType))
-                return BehaviorCategory.HQ;
+                return BehaviorCategory.Session;
 
             if ((typeof(HQController).IsAssignableFrom(behaviorType)))
                 return BehaviorCategory.Controller;

@@ -29,18 +29,49 @@ namespace HQDotNet {
     /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="HQSessionModel.Behaviors"/>
     /// </summary>
     /// 
-    public sealed class HQSession : HQCoreBehavior{
+    public class HQSession : HQController{
 
         private static HQSession _current;
         private HQDispatcher _dispatcher;
         private HQInjector _injector;
         private HQRegistry _registry;
 
+        //To be in model
+        private System.DateTime _startDate;
 
         public static HQSession Current {
             get {
                 return _current;
             }
+        }
+
+        public HQSession() {
+
+            //Set up our core functionality
+            _registry = new HQRegistry();
+            _injector = new HQInjector();
+            _dispatcher = new HQDispatcher();
+
+            _registry.RegisterController(this);
+            _registry.RegisterController(_dispatcher);
+
+            //Use a method rather than injection for these
+            //Since only this class should be mediating
+            _injector.SetRegistry(_registry);
+            _dispatcher.SetRegistry(_registry);
+            _startDate = System.DateTime.Now;
+        }
+
+        public HQDispatcher Dispatcher {
+            get { return _dispatcher; }
+        }
+
+        public System.DateTime StartDate {
+            get { return _startDate; }
+        }
+
+        public System.TimeSpan TimeSinceStarted {
+            get { return System.DateTime.Now - _startDate; }
         }
 
         /// <summary>
@@ -58,7 +89,6 @@ namespace HQDotNet {
         public static bool HasSession {
             get { return _current != null; }
         }
-
 
         /// <summary>
         /// Register a singleton behavior for a type of controller 
@@ -121,23 +151,10 @@ namespace HQDotNet {
         /// </summary>
         /// <returns></returns>
         public override bool Startup() {
-
-            //Set up our core functionality
-            _registry = new HQRegistry();
-            _injector = new HQInjector();
-            _dispatcher = new HQDispatcher();
-
             bool allStarted = _dispatcher.Startup();
 
-            _registry.RegisterController(_dispatcher);
-
-            //Use a method rather than injection for these
-            //Since only this class should be mediating
-            _injector.SetRegistry(_registry);
-            _dispatcher.SetRegistry(_registry);
-
             //Servies
-            foreach(var service in _registry.Services.Values) {
+            foreach (var service in _registry.Services.Values) {
                 if(service.Phase == HQPhase.Initialized) {
                     allStarted &= service.Startup();
                 }
@@ -145,7 +162,7 @@ namespace HQDotNet {
 
             //Controllers
             foreach(var controller in _registry.Controllers.Values) {
-                if(controller.Phase == HQPhase.Initialized) {
+                if(controller != this && controller.Phase == HQPhase.Initialized) {
                     allStarted &= controller.Startup();
                 }
             }
@@ -190,7 +207,8 @@ namespace HQDotNet {
 
                 //Controllers
                 foreach (var controller in _registry.Controllers.Values) {
-                    controller.Update();
+                    if(controller != this)
+                        controller.Update();
                 }
 
                 //Views
@@ -217,7 +235,8 @@ namespace HQDotNet {
 
                 //Controllers
                 foreach (var controller in _registry.Controllers.Values) {
-                    controller.LateUpdate();
+                    if(controller != this)
+                        controller.LateUpdate();
                 }
 
                 //Views
@@ -241,7 +260,8 @@ namespace HQDotNet {
 
             //Controllers
             foreach (var controller in _registry.Controllers.Values) {
-                allShutDown &= controller.Shutdown();
+                if(controller != this)
+                    allShutDown &= controller.Shutdown();
             }
 
             //Views

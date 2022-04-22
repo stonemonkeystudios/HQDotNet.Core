@@ -2,7 +2,7 @@
 
 namespace HQDotNet {
 
-    public class HQController : HQSingletonBehavior{
+    public class HQController : HQCoreBehavior{
 
         [HQInject]
         protected HQDispatcher _dispatcher;

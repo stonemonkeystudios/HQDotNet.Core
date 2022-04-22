@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
     <AssemblyName>HQDotNet</AssemblyName>
     <RootNamespace>HQDotNet</RootNamespace>
+    <Configurations>Debug;Release;UnityRelease</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,13 +16,17 @@
     <CodeAnalysisRuleSet />
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\HQDotNet-Model\HQDotNet-Model.csproj" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UnityRelease|AnyCPU'">
+    <CodeAnalysisRuleSet />
+    <OutputPath>$(SolutionDir)Release\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='UnityRelease|netstandard2.1|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controller\" />
-    <Folder Include="Utilities\" />
+    <ProjectReference Include="..\HQDotNet-Model\HQDotNet-Model.csproj" />
   </ItemGroup>
 
 </Project>

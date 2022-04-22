@@ -9,7 +9,7 @@ namespace HQDotNet {
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TViewModel"></typeparam>
     public class HQView : HQCoreBehavior, IModelListener<HQViewModel>, IModelListener<HQDataModel>{
-        protected bool IsDirty { get; set; }
+        public bool IsDirty { get; set; }
 
         public virtual bool Render() {
             return true;

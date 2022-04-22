@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
-using HQDotNet.Model;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HQDotNet
 {
@@ -24,17 +25,17 @@ namespace HQDotNet
         //It would be nice for these to also be immediately injectable.[HQInject]
         private HQRegistry _registry;
 
-        private Queue<Action> _pendingDispatch;
+        private ConcurrentQueue<Action> _pendingDispatch;
 
         public HQDispatcher() : base() {
-            _pendingDispatch = new Queue<Action>();
+            _pendingDispatch = new ConcurrentQueue<Action>();
         }
 
         public void SetRegistry(HQRegistry registry) {
             _registry = registry;
         }
 
-        public void RegisterDispatchListenersForObject(HQObject listenerObject){
+        public void RegisterDispatchListenersForObject(object listenerObject){
             //Iterate all listener types on the given object
             Type listenerType = listenerObject.GetType();
             Type baseDispatchListenerType = typeof(IDispatchListener);
@@ -49,7 +50,7 @@ namespace HQDotNet
             }
         }
 
-        public void UnregisterDispatchListenersForObject(HQObject listenerObject) {
+        public void UnregisterDispatchListenersForObject(object listenerObject) {
             //Iterate all listener types on the given object
             Type listenerType = listenerObject.GetType();
             Type baseDispatchListenerType = typeof(IDispatchListener);
@@ -79,9 +80,11 @@ namespace HQDotNet
         }
 
         private void ExecuteDispatchQueue() {
-            while(_pendingDispatch.Count > 0) {
-                Action queuedAction = _pendingDispatch.Dequeue();
-                queuedAction();
+            Action dequeuedAction;
+            if (_pendingDispatch != null) {
+                while (_pendingDispatch.TryDequeue(out dequeuedAction)) {
+                    dequeuedAction();
+                }
             }
         }
 
