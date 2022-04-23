@@ -2,7 +2,7 @@ using System;
 using HQDotNet.Model;
 
 namespace HQDotNet {
-    public interface IModelListener<TModelType> : IDispatchListener where TModelType : HQDataModel {
+    public interface IModelListener<TModelType> : IDispatchListener{
 
         void OnModelUpdated(TModelType model);
 

@@ -1,10 +1,13 @@
-﻿using HQDotNet.Model;
+﻿using System.Collections.Generic;
 
 namespace HQDotNet {
-    public interface IModelCollectionListener<TModelType> : IDispatchListener where TModelType : HQDataModel {
+    public interface IModelCollectionListener<TCollection, TModel> : IDispatchListener
+        where TCollection : ICollection<TModel>{
 
-        void OnModelAdded(TModelType model);
+        void OnModelAdded(TModel model);
 
-        void OnDataUpdated(TModelType model);
+        void OnModelUpdated(TModel model);
+
+        void OnModelDeleted(TModel model);
     }
 }
