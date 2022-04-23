@@ -1,0 +1,1 @@
+copy $(ProjectDir)\bin\UnityRelease\netstandard2.1\*.dll $(ProjectDir)\..\HQDotNet-UnityPackage\Assets\HQDotNet.Unity\

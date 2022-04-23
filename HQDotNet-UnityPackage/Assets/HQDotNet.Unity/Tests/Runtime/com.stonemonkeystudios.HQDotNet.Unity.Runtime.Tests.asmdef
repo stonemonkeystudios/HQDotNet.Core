@@ -1,0 +1,16 @@
+{
+    "name": "com.stonemonkeystudios.HQDotNet.Unity.Runtime.Tests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0a8b514e68a71cb4a9be4bb5da80e0e1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

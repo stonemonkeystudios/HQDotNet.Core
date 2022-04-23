@@ -10,7 +10,6 @@ namespace HQDotNet {
     /// <typeparam name="TViewModel"></typeparam>
     public class HQExternalView : HQView{
         public Action<HQExternalView> onViewUpdated;
-        public bool IsDirty { get; set; }
 
         public override bool Render() {
             onViewUpdated?.Invoke(this);

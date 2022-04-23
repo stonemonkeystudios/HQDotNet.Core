@@ -8,7 +8,7 @@ namespace HQDotNet {
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TViewModel"></typeparam>
-    public class HQView : HQCoreBehavior, IModelListener<HQViewModel>, IModelListener<HQDataModel>{
+    public class HQView : HQCoreBehavior, IModelListener<object>{
         public bool IsDirty { get; set; }
 
         public virtual bool Render() {
@@ -26,12 +26,7 @@ namespace HQDotNet {
 
             base.Update();
         }
-
-        void IModelListener<HQViewModel>.OnModelUpdated(HQViewModel model) {
-            Render();
-        }
-
-        void IModelListener<HQDataModel>.OnModelUpdated(HQDataModel model) {
+        void IModelListener<object>.OnModelUpdated(object model) {
             Render();
         }
     }

@@ -6,6 +6,8 @@
     <AssemblyName>HQDotNet</AssemblyName>
     <RootNamespace>HQDotNet</RootNamespace>
     <Configurations>Debug;Release;UnityRelease</Configurations>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,10 +25,19 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='UnityRelease|netstandard2.1|AnyCPU'">
     <DocumentationFile></DocumentationFile>
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='UnityRelease|net461|AnyCPU'">
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HQDotNet-Model\HQDotNet-Model.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(ProjectDir)..\Release\netstandard2.1\*.dll $(ProjectDir)..\HQDotNet-UnityPackage\Assets\HQDotNet.Unity\lib\" />
+  </Target>
 
 </Project>
