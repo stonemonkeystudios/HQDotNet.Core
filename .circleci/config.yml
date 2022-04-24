@@ -4,7 +4,6 @@ version: 2.1
 
 orbs:
     win: circleci/windows@4.1
-    unity-build: w3d/unity-build@0.0.7
 
 # Define the jobs we want to run for this project
 jobs:
@@ -34,7 +33,7 @@ jobs:
 
   unity-package:
     executor: 
-        name: w3d/unity-build
+        name: win/default
         size: "medium"
     steps:
       - checkout
