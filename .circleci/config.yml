@@ -13,8 +13,11 @@ jobs:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     # Be sure to update the tag on this image to a more stable version, using latest can result in unstable builds.
-    #docker:
-    #  - image: microsoft/dotnet:latest
+    docker:
+      - image: microsoft/dotnet:latest
+        auth:
+          username: stonemonkeystudios
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var 
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
