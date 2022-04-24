@@ -22,14 +22,15 @@ jobs:
       - run:
           command: dir 
       - store_artifacts:
-          path: C:\Users\circleci\project\HQDotNet-Core\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
+          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
           destination: C:\Build\Release\bin\netstandard2.1
       - store_artifacts:
-          path: C:\Users\circleci\project\HQDotNet-Core\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: C:\Build\Release\bin\netstandard2.1
       - run: |
+          cd C:\Users\circleci\project\HQDotNet-Core\bin
           dir
-          cd C:\Users\circleci\project\HQDotNet-Core
+          cd C:\Users\circleci\project\HQDotNet-Core\bin\Release
           dir
 
   test:
