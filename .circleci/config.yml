@@ -14,12 +14,18 @@ jobs:
     steps:
       - checkout
       - run: 
-          name: "Run Build Step"
+          name: Run Build Step
           command: dotnet.exe build
+      - run:
+          name: Make artifact directory
+          command: mkdir /tmp/artifacts;
+
       - store_artifacts:
-          path: .\Release\netstandard2.1\HQDotNet.dll
+          path: /Release/netstandard2.1/HQDotNet.dll
+          destination: /bin/dotnetstandard2.1/
       - store_artifacts:
-          path: .\Release\netstandard2.1\HQDotNet.Model.dll
+          path: /Release/netstandard2.1/HQDotNet.Model.dll
+          destination: /bin/dotnetstandard2.1/
   test:
     executor:
         name: win/default
@@ -28,7 +34,7 @@ jobs:
       - checkout
       - run: dotnet.exe test
       - store_test_results:
-          path: .\TestResults
+          path: \testresults
 
 # Orchestrate our job run sequence
 workflows:
