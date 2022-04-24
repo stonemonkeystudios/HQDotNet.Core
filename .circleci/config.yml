@@ -27,8 +27,10 @@ jobs:
       - store_artifacts:
           path: C:\Users\circleci\project\HQDotNet-Core\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: C:\Build\Release\bin\netstandard2.1
-      - run:
-          command: dir /S
+      - run: |
+          dir
+          cd C:\Users\circleci\project\HQDotNet-Core
+          dir
 
   test:
     executor:
