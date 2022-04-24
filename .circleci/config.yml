@@ -15,7 +15,7 @@ jobs:
       - checkout
       - run: 
           name: Run Build Step
-          command: dotnet.exe build -c Release
+          command: dotnet build -c Release
       - persist_to_workspace:
           root: C:\Users\circleci\project
           paths:
@@ -31,10 +31,17 @@ jobs:
         size: "medium"
     steps:
       - checkout
-      - run: dotnet.exe test -c Release
-      - run: dir
+      - run: dotnet test -c Release
+      
+      - run:
+          name: test results
+          when: always
+          command: |
+              dotnet tool install -g trx2junit
+              export PATH="$PATH:/root/.dotnet/tools"
+              trx2junit TestResults/*.trx
       - store_test_results:
-          path: TestResults\*
+          path: TestResults
 
   unity-package:
     executor: 
