@@ -18,15 +18,15 @@ jobs:
           command: dotnet.exe build
       - run:
           name: Make artifact directory
-          command: mkdir \Build\Release\bin\netstandard2.1
+          command: mkdir C:\Build\Release\bin\netstandard2.1
       - run:
           command: dir 
       - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
-          destination: \Build\Release\bin\netstandard2.1
+          path: C:\Users\circleci\project\HQDotNet-Core\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
+          destination: C:\Build\Release\bin\netstandard2.1
       - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: \Build\Release\bin\netstandard2.1
+          path: C:\Users\circleci\project\HQDotNet-Core\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          destination: C:\Build\Release\bin\netstandard2.1
       - run:
           command: dir /S
 
@@ -37,8 +37,11 @@ jobs:
     steps:
       - checkout
       - run: dotnet.exe test
+      - run:
+          name: Make artifact directory
+          command: mkdir C:\Build\Release\TestResults
       - store_test_results:
-          path: \Build\Release\TestResults
+          path: C:\Build\Release\TestResults
       - run:
           command: dir
 

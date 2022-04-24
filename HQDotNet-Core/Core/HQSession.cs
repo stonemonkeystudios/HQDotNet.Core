@@ -62,10 +62,6 @@ namespace HQDotNet {
             _startDate = System.DateTime.Now;
         }
 
-        public HQDispatcher Dispatcher {
-            get { return _dispatcher; }
-        }
-
         public System.DateTime StartDate {
             get { return _startDate; }
         }

@@ -3,6 +3,6 @@
 namespace HQDotNet.Model {
     public class HQModelCollection : HQDataModel{
 
-        public new List<HQDataModel> models;
+        public List<HQDataModel> models;
     }
 }
