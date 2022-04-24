@@ -18,14 +18,17 @@ jobs:
           command: dotnet.exe build
       - run:
           name: Make artifact directory
-          command: mkdir /tmp/artifacts;
-
+          command: mkdir /bin/dotnetstandard2.1/;
+      - run:
+          command: dir 
       - store_artifacts:
           path: /Release/netstandard2.1/HQDotNet.dll
           destination: /bin/dotnetstandard2.1/
       - store_artifacts:
           path: /Release/netstandard2.1/HQDotNet.Model.dll
           destination: /bin/dotnetstandard2.1/
+      - run:
+          command: dir
   test:
     executor:
         name: win/default
