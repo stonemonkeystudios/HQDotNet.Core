@@ -16,13 +16,17 @@ jobs:
       - run: 
           name: "Run Build Step"
           command: dotnet.exe build
+      - store_artifacts:
+          path: .\Release\netstandard2.1\HQDotNet.dll
+      - store_artifacts:
+          path: .\Release\netstandard2.1\HQDotNet.Model.dll
   test:
     executor:
         name: win/default
         size: "medium"
     steps:
       - checkout
-      - run: echo "this is the test job"
+      - run: dotnet.exe test
 
 # Orchestrate our job run sequence
 workflows:
