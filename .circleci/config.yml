@@ -16,6 +16,10 @@ jobs:
       - run: 
           name: Run Build Step
           command: dotnet.exe build -c Release
+      - persist_to_workspace:
+          root: C:\Users\circleci\project
+          paths:
+            - HQDotNet-Core\bin\Release
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
       - store_artifacts:
@@ -30,7 +34,7 @@ jobs:
       - run: dotnet.exe test -c Release
       - run: dir
       - store_test_results:
-          path: TestResults
+          path: TestResults\*
 
   unity-package:
     executor: 
@@ -47,8 +51,10 @@ workflows:
   HQDotNet.Core-Release:
     jobs:
       - build
-      - test
-      - unity-package:
+      - test:
           requires:
             - build
+      - unity-package:
+          requires:
+            - test
 
