@@ -17,9 +17,9 @@ jobs:
           name: Run Build Step
           command: dotnet build -c Release
       - persist_to_workspace:
-          root: C:\Users\circleci\project
+          root: .
           paths:
-            - HQDotNet-Core\bin\Release
+            - .
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
       - store_artifacts:
@@ -38,7 +38,7 @@ jobs:
           when: always
           command: |
               dotnet tool install -g trx2junit
-              export PATH="$PATH:/root/.dotnet/tools"
+              export PATH="C:\.dotnet\tools"
               trx2junit TestResults/*.trx
       - store_test_results:
           path: TestResults
