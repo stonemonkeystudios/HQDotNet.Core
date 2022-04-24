@@ -7,7 +7,7 @@ orbs:
 
 # Define the jobs we want to run for this project
 jobs:
-  build:
+  build-test-release-dev:
     executor:
         name: win/default
         size: "medium"
@@ -40,4 +40,4 @@ jobs:
 workflows:
   HQDotNet.Core-Release:
     jobs:
-      - build_test_release
+      - build-test-release-dev
