@@ -2,23 +2,24 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+orbs:
+    win: circleci/windows@4.1
+
 # Define the jobs we want to run for this project
 jobs:
   build:
-    docker:
-      - image: mcr.microsoft.com/dotnet:latest
-        auth:
-          username: stonemonkeystudios
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var 
+    executor:
+        name: win/default
+        size: "medium"
     steps:
       - checkout
-      - run: echo "this is the build job"
+      - run: 
+          name: "Run Build Step"
+          command: dotnet.exe build
   test:
-    docker:
-      - image: mcr.microsoft.com/dotnet:latest
-        auth:
-          username: stonemonkeystudios
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var 
+    executor:
+        name: win/default
+        size: "medium"
     steps:
       - checkout
       - run: echo "this is the test job"
