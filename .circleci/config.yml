@@ -15,7 +15,7 @@ jobs:
       - checkout
       - run: 
           name: Run Build Step
-          command: dotnet.exe build
+          command: dotnet.exe build -c Release
       - run:
           name: Make artifact directory
           command: mkdir C:\Build\Release\bin\netstandard2.1
@@ -32,13 +32,6 @@ jobs:
           dir
           cd C:\Users\circleci\project\HQDotNet-Core\bin\Release
           dir
-
-  test:
-    executor:
-        name: win/default
-        size: "medium"
-    steps:
-      - checkout
       - run: dotnet.exe test
       - run:
           name: Make artifact directory
@@ -53,6 +46,3 @@ workflows:
   HQDotNet.Core-Release:
     jobs:
       - build
-      - test:
-          requires:
-            - build
