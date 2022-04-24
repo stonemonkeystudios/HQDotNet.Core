@@ -17,9 +17,9 @@ jobs:
           name: Run Build Step
           command: dotnet.exe build -c Release
       - store_artifacts:
-          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
       - store_artifacts:
-          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
 
   test:
     executor:
@@ -30,7 +30,7 @@ jobs:
       - run: dotnet.exe test -c Release
       - run: dir
       - store_test_results:
-          path: C:\Users\circleci\project\TestResults
+          path: TestResults
 
   unity-package:
     executor: 
@@ -38,8 +38,9 @@ jobs:
         size: "medium"
     steps:
       - checkout
-      - run: 
-          command: dir
+      - run: |
+          cd HQDotNet-Core;
+          dir; 
 
 # Orchestrate our job run sequence
 workflows:
