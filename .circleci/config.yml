@@ -39,7 +39,7 @@ jobs:
           command: |
               dotnet tool install -g trx2junit
               export PATH="C:\.dotnet\tools"
-              trx2junit TestResults/*.trx
+              trx2junit TestResults\*.trx
       - store_test_results:
           path: TestResults
 
