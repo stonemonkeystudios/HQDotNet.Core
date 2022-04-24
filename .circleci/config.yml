@@ -6,7 +6,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: microsoft/dotnet:latest
+      - image: mcr.microsoft.com/dotnet:latest
         auth:
           username: stonemonkeystudios
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var 
@@ -15,7 +15,7 @@ jobs:
       - run: echo "this is the build job"
   test:
     docker:
-      - image: microsoft/dotnet:latest
+      - image: mcr.microsoft.com/dotnet:latest
         auth:
           username: stonemonkeystudios
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var 
