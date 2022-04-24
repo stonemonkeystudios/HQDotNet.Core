@@ -16,13 +16,12 @@ jobs:
       - run: 
           name: Run Build Step
           command: dotnet.exe build -c Release
-      - run:
-          name: Make artifact directory
-          command: mkdir C:\Build\Release\bin\netstandard2.1
       - store_artifacts:
-          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
+          path: HQDotNet-Core\bin\Release
       - store_artifacts:
-          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          path: HQDotNet-Model\bin\Release
+      - store_artifacts:
+          path: HQDotNet-Core-Test\bin\Release
 
   test:
     executor:
@@ -31,11 +30,8 @@ jobs:
     steps:
       - checkout
       - run: dotnet.exe test
-      - run: Copy Test Results |
-            dir
-            move C:\Users\circleci\project\TestResults C:\Build\Release\TestResults
       - store_test_results:
-          path: C:\Build\Release\TestResults
+          path: TestResults
 
 # Orchestrate our job run sequence
 workflows:
