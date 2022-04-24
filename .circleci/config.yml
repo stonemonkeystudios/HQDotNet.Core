@@ -28,7 +28,8 @@ jobs:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: \Build\Release\bin\netstandard2.1
       - run:
-          command: dir
+          command: dir /S
+
   test:
     executor:
         name: win/default
