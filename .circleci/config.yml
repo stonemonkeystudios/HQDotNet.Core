@@ -32,6 +32,7 @@ jobs:
       - checkout
       - run: dotnet.exe test
       - run: Copy Test Results |
+            dir
             move C:\Users\circleci\project\TestResults C:\Build\Release\TestResults
       - store_test_results:
           path: C:\Build\Release\TestResults
