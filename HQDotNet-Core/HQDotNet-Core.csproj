@@ -36,8 +36,4 @@
     <ProjectReference Include="..\HQDotNet-Model\HQDotNet-Model.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(ProjectDir)..\Release\netstandard2.1\*.dll $(ProjectDir)..\HQDotNet-UnityPackage\Assets\HQDotNet.Unity\lib\" />
-  </Target>
-
 </Project>
