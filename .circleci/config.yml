@@ -18,15 +18,15 @@ jobs:
           command: dotnet.exe build
       - run:
           name: Make artifact directory
-          command: mkdir /bin/dotnetstandard2.1/;
+          command: mkdir \bin\Release\netstandard2.1
       - run:
           command: dir 
       - store_artifacts:
-          path: /Release/netstandard2.1/HQDotNet.dll
-          destination: /bin/dotnetstandard2.1/
+          path: HQDotNet-Core\bin\Release\netstandard2.1
+          destination: \bin\Release\netstandard2.1
       - store_artifacts:
           path: /Release/netstandard2.1/HQDotNet.Model.dll
-          destination: /bin/dotnetstandard2.1/
+          destination: \bin\Release\netstandard2.1
       - run:
           command: dir
   test:
@@ -38,6 +38,8 @@ jobs:
       - run: dotnet.exe test
       - store_test_results:
           path: \testresults
+      - run:
+          command: dir
 
 # Orchestrate our job run sequence
 workflows:
