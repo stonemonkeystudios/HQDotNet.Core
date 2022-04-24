@@ -23,21 +23,16 @@ jobs:
           command: dir 
       - store_artifacts:
           path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
-          destination: C:\Build\Release\bin\netstandard2.1
+          destination: C:\Build\Release\bin\netstandard2.1\
       - store_artifacts:
           path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: C:\Build\Release\bin\netstandard2.1
-      - run: |
-          cd C:\Users\circleci\project\HQDotNet-Core\bin
-          dir
-          cd C:\Users\circleci\project\HQDotNet-Core\bin\Release
-          dir
+          destination: C:\Build\Release\bin\netstandard2.1\
       - run: dotnet.exe test
       - run:
           name: Make artifact directory
           command: mkdir C:\Build\Release\TestResults
       - store_test_results:
-          path: C:\Build\Release\TestResults
+          path: C:\Users\circleci\project\TestResults
       - run:
           command: dir
 
@@ -45,4 +40,4 @@ jobs:
 workflows:
   HQDotNet.Core-Release:
     jobs:
-      - build
+      - build_test_release
