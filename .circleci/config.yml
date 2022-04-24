@@ -7,7 +7,7 @@ orbs:
 
 # Define the jobs we want to run for this project
 jobs:
-  build-test-release-dev:
+  build:
     executor:
         name: win/default
         size: "medium"
@@ -19,25 +19,29 @@ jobs:
       - run:
           name: Make artifact directory
           command: mkdir C:\Build\Release\bin\netstandard2.1
-      - run:
-          command: dir 
       - store_artifacts:
           path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
-          destination: C:\Build\Release\bin\netstandard2.1\
+          destination: C:\Build\Release\bin\netstandard2.1\HQDotNet.dll
       - store_artifacts:
           path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: C:\Build\Release\bin\netstandard2.1\
+          destination: C:\Build\Release\bin\netstandard2.1\HQDotNet.Model.dll
+
+  test:
+    executor:
+        name: win/default
+        size: "medium"
+    steps:
+      - checkout
       - run: dotnet.exe test
-      - run:
-          name: Make artifact directory
-          command: mkdir C:\Build\Release\TestResults
+      - run: Copy Test Results |
+            move C:\Users\circleci\project\TestResults C:\Build\Release\TestResults
       - store_test_results:
-          path: C:\Users\circleci\project\TestResults
-      - run:
-          command: dir
+          path: C:\Build\Release\TestResults
 
 # Orchestrate our job run sequence
 workflows:
   HQDotNet.Core-Release:
     jobs:
-      - build-test-release-dev
+      - build
+      - test
+
