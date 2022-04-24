@@ -41,5 +41,7 @@ workflows:
   HQDotNet.Core-Release:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
 
