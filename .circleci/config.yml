@@ -4,6 +4,7 @@ version: 2.1
 
 orbs:
     win: circleci/windows@4.1
+    unity-build: w3d/unity-build@0.0.7
 
 # Define the jobs we want to run for this project
 jobs:
@@ -17,11 +18,9 @@ jobs:
           name: Run Build Step
           command: dotnet.exe build -c Release
       - store_artifacts:
-          path: HQDotNet-Core\bin\Release
+          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
       - store_artifacts:
-          path: HQDotNet-Model\bin\Release
-      - store_artifacts:
-          path: HQDotNet-Core-Test\bin\Release
+          path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
 
   test:
     executor:
@@ -29,16 +28,26 @@ jobs:
         size: "medium"
     steps:
       - checkout
-      - run: dotnet.exe test
+      - run: dotnet.exe test -c Release
       - store_test_results:
-          path: TestResults
+          path: C:\Users\circleci\project\TestResults
+
+  unity-package:
+    executor: 
+        name: w3d/unity-build
+        size: "medium"
+    steps:
+      - checkout
+      - run: 
+          command: dir
 
 # Orchestrate our job run sequence
 workflows:
   HQDotNet.Core-Release:
     jobs:
       - build
-      - test:
+      - test
+      - unity-package:
           requires:
             - build
 
