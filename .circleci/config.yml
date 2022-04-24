@@ -21,10 +21,8 @@ jobs:
           command: mkdir C:\Build\Release\bin\netstandard2.1
       - store_artifacts:
           path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
-          destination: C:\Build\Release\bin\netstandard2.1\HQDotNet.dll
       - store_artifacts:
           path: C:\Users\circleci\project\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: C:\Build\Release\bin\netstandard2.1\HQDotNet.Model.dll
 
   test:
     executor:
