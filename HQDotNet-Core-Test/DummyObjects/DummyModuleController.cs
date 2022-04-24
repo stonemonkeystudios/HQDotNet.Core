@@ -32,9 +32,9 @@ namespace HQDotNet.Test {
         private void DispatchOnModelUpdated(DummyData data) {
             HQDispatcher.DispatchMessageDelegate<IModelListener<DummyData>> dispatchMessage =
                 (IModelListener<DummyData> modelListener) => {
-                    return () => modelListener.OnModelUpdated(data);
+                    return () => modelListener.OnModelUpdated(ref data);
                 };
-            _dispatcher.Dispatch(dispatchMessage);
+            dispatcher.Dispatch(dispatchMessage);
         }
     }
 }

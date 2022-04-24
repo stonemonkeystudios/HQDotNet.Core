@@ -11,7 +11,6 @@ namespace HQDotNet
         const BindingFlags INJECT_BINDING_FLAGS = BindingFlags.NonPublic | BindingFlags.Instance;
 
         private HQRegistry _registry;
-        private Dictionary<Type, List<Type>> _ruleset;
 
         public void SetRegistry(HQRegistry registry) {
             _registry = registry;

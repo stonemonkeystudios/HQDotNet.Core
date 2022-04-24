@@ -12,7 +12,7 @@ namespace HQDotNet.Test {
             return _controller != null;
         }
 
-        void IModelListener<DummyData>.OnModelUpdated(DummyData model) {
+        void IModelListener<DummyData>.OnModelUpdated(ref DummyData model) {
             //System.Console.WriteLine("OnModelUpdated DummyModel: " + model.title);
             DisplayString = model.title;
         }

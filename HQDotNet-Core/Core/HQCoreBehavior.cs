@@ -13,6 +13,9 @@ namespace HQDotNet {
         [HQInject]
         protected HQSession session; //The session this behavior lives in
 
+        [HQInject]
+        protected HQDispatcher dispatcher;
+
         /// <summary>
         /// Shuts down this behavior and unregisters itself from a session
         /// </summary>
