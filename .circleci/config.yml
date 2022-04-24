@@ -28,6 +28,7 @@ jobs:
     steps:
       - checkout
       - run: dotnet.exe test -c Release
+      - run: dir
       - store_test_results:
           path: C:\Users\circleci\project\TestResults
 
