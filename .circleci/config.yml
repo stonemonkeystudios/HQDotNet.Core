@@ -21,8 +21,11 @@ jobs:
           paths:
             - .
       - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1
-          destination: \artifacts\Release\
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll
+          destination: \artifacts\Release\netstandard2.1\
+      - store_artifacts:
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          destination: \artifacts\Release\netstandard2.1\
 
   test:
     executor:
@@ -53,7 +56,7 @@ jobs:
       - run: 
           name: Deploy Release to GitHub
           command: 
-            VERSION="0.1.1"
+            VERSION=$(0.1.1)
             go get github.com/tcnksm/ghr
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 # #$(\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll --version)
