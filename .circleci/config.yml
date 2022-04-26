@@ -55,6 +55,8 @@ jobs:
       - run: 
           name: Deploy Release to GitHub
           command: 
+            VERSION=$(\artifacts\Release\netstandard2.1\HQDotNet.dll --version)
+            go get github.com/tcnksm/ghr
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 # Orchestrate our job run sequence
