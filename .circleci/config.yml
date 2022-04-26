@@ -20,12 +20,6 @@ jobs:
           root: .
           paths:
             - .
-      - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll
-          destination: \artifacts\Release\netstandard2.1\
-      - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: \artifacts\Release\netstandard2.1\
 
   test:
     executor:
@@ -52,7 +46,12 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: dir;
+      - store_artifacts:
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll
+          destination: \artifacts\Release\netstandard2.1\
+      - store_artifacts:
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          destination: \artifacts\Release\netstandard2.1\
       - run: 
           name: Deploy Release to GitHub
           command: |
