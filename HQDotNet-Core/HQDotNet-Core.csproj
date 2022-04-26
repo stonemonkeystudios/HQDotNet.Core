@@ -8,6 +8,7 @@
     <Configurations>Debug;Release;UnityRelease</Configurations>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <FileVersion>0.1.1</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
