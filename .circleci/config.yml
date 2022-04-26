@@ -21,11 +21,8 @@ jobs:
           paths:
             - .
       - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
-          destination: \artifacts\Release\netstandard2.1\HQDotNet.dll
-      - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: \artifacts\Release\netstandard2.1\HQDotNet.dll
+          path: HQDotNet-Core\bin\Release\netstandard2.1
+          destination: \artifacts\Release\
 
   test:
     executor:
