@@ -17,19 +17,12 @@ jobs:
           name: Run Build Step
           command: dotnet build -c Release
       - store_artifacts:
-          path: HQDotNet-Core\bin\Release\*
-          destination: \artifacts\Release\
+          path: HQDotNet-Core\bin\Release
+          destination: \artifacts\
       - persist_to_workspace:
           root: .
           paths:
             - .
-<<<<<<< Updated upstream
-      - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
-      - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-=======
->>>>>>> Stashed changes
 
   test:
     executor:
