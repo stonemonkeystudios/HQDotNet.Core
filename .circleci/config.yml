@@ -22,19 +22,21 @@ jobs:
             - .
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
+          destination: \artifacts\Release\netstandard2.1\HQDotNet.dll
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          destination: \artifacts\Release\netstandard2.1\HQDotNet.dll
 
   test:
     executor:
         name: win/default
         size: "medium"
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
       - run: dotnet test -c Release
-      
       - run:
-          name: test results
+          name: Run Tests
           when: always
           command: |
               dotnet tool install -g trx2junit
@@ -43,15 +45,17 @@ jobs:
       - store_test_results:
           path: TestResults
 
-  unity-package:
+  release:
     executor: 
         name: win/default
         size: "medium"
     steps:
-      - checkout
-      - run: |
-          cd HQDotNet-Core;
-          dir; 
+      - attach_workspace:
+          at: .
+      - run: 
+          name: Deploy Release to GitHub
+          command: 
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 # Orchestrate our job run sequence
 workflows:
@@ -61,7 +65,6 @@ workflows:
       - test:
           requires:
             - build
-      - unity-package:
+      - release:
           requires:
             - test
-
