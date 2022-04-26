@@ -57,7 +57,7 @@ jobs:
           name: Deploy Release to GitHub
           command: |
             $VERSION = "0.1.1";
-            go install github.com/tcnksm/ghr@Latest;
+            go install github.com/tcnksm/ghr;
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/ ;
 # #$(\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll --version)
 # Orchestrate our job run sequence
