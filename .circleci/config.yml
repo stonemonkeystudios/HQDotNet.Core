@@ -37,35 +37,29 @@ jobs:
               trx2junit TestResults\*.trx
       - store_test_results:
           path: TestResults
-
-              # PATH="${PATH}:/root/.dotnet/tools"
-  release:
-    executor: 
-        name: win/default
-        size: "medium"
-    steps:
-      - attach_workspace:
-          at: .
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll
           destination: \artifacts\Release\netstandard2.1\
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: \artifacts\Release\netstandard2.1\
-      - run: 
-          name: Deploy Release to GitHub
+              # PATH="${PATH}:/root/.dotnet/tools"
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
           command: |
-          
-            $VERSION = "0.1.1";
-            zip -r $CIRCLE_ARTIFACTS/$PROJECT_NAME-$CIRCLE_TAG.zip dist/*
-            git config user.name $CIRCLE_PROJECT_USERNAME;
-            gren --override --data-source=commits;
-            github-release upload --user $CIRCLE_PROJECT_USERNAME --repo $CIRCLE_PROJECT_REPONAME --tag $CIRCLE_TAG --name $CIRCLE_PROJECT_REPONAME"."$CIRCLE_TAG"-build-"$CIRCLE_BUILD_NUM".zip" --file $CIRCLE_ARTIFACTS/$PROJECT_NAME-$CIRCLE_TAG.zip
-            
+            VERSION=$(my-binary --version)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
             #go install github.com/tcnksm/ghr;
             #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/ ;
-# #$(\HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll --version)
-# Orchestrate our job run sequence
+
+
 workflows:
   HQDotNet.Core-Release:
     jobs:
@@ -73,6 +67,6 @@ workflows:
       - test:
           requires:
             - build
-      - release:
+      - publish-github-release:
           requires:
             - test
