@@ -39,10 +39,10 @@ jobs:
           path: TestResults
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll
-          destination: .\artifacts\Release\netstandard2.1\HQDotNet.Core.dll
+          destination: artifacts\Release\netstandard2.1\HQDotNet.Core.dll
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: .\artifacts\Release\netstandard2.1\HQDotNet.Model.dll
+          destination: artifacts\Release\netstandard2.1\HQDotNet.Model.dll
           
       - persist_to_workspace:
           root: .
