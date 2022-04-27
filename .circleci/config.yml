@@ -39,10 +39,10 @@ jobs:
           path: TestResults
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll
-          destination: \artifacts\Release\netstandard2.1\
+          destination: .\artifacts\Release\netstandard2.1\
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: \artifacts\Release\netstandard2.1\
+          destination: .\artifacts\Release\netstandard2.1\
               # PATH="${PATH}:/root/.dotnet/tools"
 
   publish-github-release:
