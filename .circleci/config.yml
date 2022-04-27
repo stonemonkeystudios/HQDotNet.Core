@@ -67,7 +67,7 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             ls;
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "v0.1.1" ./artifacts/
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "v0.1.1" ./Release/
 
 workflows:
   HQDotNet.Core-Release:
