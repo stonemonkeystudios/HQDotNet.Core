@@ -40,11 +40,11 @@ jobs:
       - run:
           mkdir Release;
           mkdir Release\netstandard2.1;
-          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll Release\netstandard2.1\HQDotNet.Core.dll;
+          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll Release\netstandard2.1\HQDotNet.dll;
           cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll Release\netstandard2.1\HQDotNet.Model.dll;
       - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll
-          destination: artifacts\Release\netstandard2.1\HQDotNet.Core.dll
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
+          destination: artifacts\Release\netstandard2.1\HQDotNet.dll
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: artifacts\Release\netstandard2.1\HQDotNet.Model.dll
@@ -66,8 +66,6 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            dir;
-            cd \;
             dir;
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "v0.1.1" ./artifacts/
 
