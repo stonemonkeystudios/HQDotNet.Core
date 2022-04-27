@@ -45,7 +45,7 @@ jobs:
           destination: .\artifacts\Release\netstandard2.1\HQDotNet.Model.dll
           
       - persist_to_workspace:
-          root: .\artifacts
+          root: .
           paths:
             - .
               # PATH="${PATH}:/root/.dotnet/tools"
