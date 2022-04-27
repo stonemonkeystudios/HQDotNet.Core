@@ -20,12 +20,6 @@ jobs:
           root: .
           paths:
             - .
-      - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
-          destination: \artifacts\Release\netstandard2.1\HQDotNet.dll
-      - store_artifacts:
-          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
-          destination: \artifacts\Release\netstandard2.1\HQDotNet.dll
 
   test:
     executor:
@@ -40,26 +34,44 @@ jobs:
           when: always
           command: |
               dotnet tool install -g trx2junit
-              PATH="${PATH}:/root/.dotnet/tools"
               trx2junit TestResults\*.trx
       - store_test_results:
           path: TestResults
+      - run:
+          mkdir Release;
+          mkdir Release\netstandard2.1;
+          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll Release\netstandard2.1\;
+          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll Release\netstandard2.1\;
+      - store_artifacts:
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
+          destination: artifacts\Release\netstandard2.1\HQDotNet.dll
+      - store_artifacts:
+          path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
+          destination: artifacts\Release\netstandard2.1\HQDotNet.Model.dll
 
-  release:
-    executor: 
-        name: win/default
-        size: "medium"
+      - run: |
+          dir;
+          cd Release\netstandard2.1; 
+          dir;
+          
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+              # PATH="${PATH}:/root/.dotnet/tools"
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
           at: .
-      - run: 
-          name: Deploy Release to GitHub
-          command: 
-            VERSION=$(\artifacts\Release\netstandard2.1\HQDotNet.dll --version)
-            go get github.com/tcnksm/ghr
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            ls Release/netstandard2.1;
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "v0.1.1" ./Release/netstandard2.1
 
-# Orchestrate our job run sequence
 workflows:
   HQDotNet.Core-Release:
     jobs:
@@ -67,6 +79,6 @@ workflows:
       - test:
           requires:
             - build
-      - release:
+      - publish-github-release:
           requires:
             - test
