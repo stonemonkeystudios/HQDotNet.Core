@@ -40,7 +40,7 @@ jobs:
       - run:
           mkdir Release;
           mkdir Release\netstandard2.1;
-          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Core.dll Release\netstandard2.1\HQDotNet.dll;
+          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll Release\netstandard2.1\HQDotNet.dll;
           cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll Release\netstandard2.1\HQDotNet.Model.dll;
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
