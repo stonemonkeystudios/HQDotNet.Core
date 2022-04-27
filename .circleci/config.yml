@@ -43,6 +43,8 @@ jobs:
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: artifacts\Release\netstandard2.1\HQDotNet.Model.dll
+
+      - run: dir
           
       - persist_to_workspace:
           root: .
@@ -59,6 +61,7 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
+            dir;
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete "v0.1.1" ./artifacts/
 
 workflows:
