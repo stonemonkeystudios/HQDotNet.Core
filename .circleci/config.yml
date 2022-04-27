@@ -40,8 +40,8 @@ jobs:
       - run:
           mkdir Release;
           mkdir Release\netstandard2.1;
-          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll Release\netstandard2.1\HQDotNet.dll;
-          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll Release\netstandard2.1\HQDotNet.Model.dll;
+          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll Release\netstandard2.1\;
+          cp HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll Release\netstandard2.1\;
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.dll
           destination: artifacts\Release\netstandard2.1\HQDotNet.dll
@@ -49,7 +49,10 @@ jobs:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: artifacts\Release\netstandard2.1\HQDotNet.Model.dll
 
-      - run: dir
+      - run: |
+          dir;
+          cd Release\netstandard2.1; 
+          dir;
           
       - persist_to_workspace:
           root: .
