@@ -43,6 +43,11 @@ jobs:
       - store_artifacts:
           path: HQDotNet-Core\bin\Release\netstandard2.1\HQDotNet.Model.dll
           destination: .\artifacts\Release\netstandard2.1\HQDotNet.Model.dll
+          
+      - persist_to_workspace:
+          root: .\artifacts
+          paths:
+            - .
               # PATH="${PATH}:/root/.dotnet/tools"
 
   publish-github-release:
