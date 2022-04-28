@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using HQDotNet.Model;
 
@@ -20,48 +22,65 @@ namespace HQDotNet
             return false;
         }
 
-        public bool Inject(HQObject behavior){
+        public bool Inject(HQCoreBehavior behavior){
             BehaviorCategory behaviorCategory = HQRegistry.GetBehaviorCategory(behavior.GetType());
 
-            foreach(Type type in _registry.Controllers.Keys) {
+            ValidateInjectionRules(behavior);
+
+            foreach(Type existingControllerT in _registry.Controllers.Keys) {
+                if(behavior.GetType() == existingControllerT) {
+                    continue;
+                }
                 switch (behaviorCategory) {
+
                     //Controller <--> Controller
                     case BehaviorCategory.Controller:
-                        Inject(behavior, _registry.Controllers[type]);
-                        Inject(_registry.Controllers[type], behavior);
+                        Inject(behavior, _registry.Controllers[existingControllerT]);
+                        Inject(_registry.Controllers[existingControllerT], behavior);
                         break;
-                    //Controller --> View
-                    case BehaviorCategory.View:
-                        Inject(behavior, _registry.Controllers[type]);
-                        break;
-                    //Controller <--> Service
+
+                    //Controller <-!-> View
+                    case BehaviorCategory.View: break;
+
+                    //Controller <-- Service
                     case BehaviorCategory.Service:
-                        Inject(behavior, _registry.Controllers[type]);
-                        Inject(_registry.Controllers[type], behavior);
+                        //Testing, Controllers will not inject into services.
+                        //Services should do data validation and dispatching
+                        //Inject(behavior, _registry.Controllers[type]);
+                        Inject(_registry.Controllers[existingControllerT], behavior);
                         break;
                 }
             }
 
-            //Service -> Controller
-            foreach(Type type in _registry.Services.Keys) {
+            //Service -> Controller, View
+            foreach(Type existingServiceT in _registry.Services.Keys) {
+                if (behavior.GetType() == existingServiceT) {
+                    continue;
+                }
                 switch (behaviorCategory) {
                     case BehaviorCategory.Controller:
-                        Inject(behavior, _registry.Services[type]);
-                        Inject(_registry.Services[type], behavior);
+                        Inject(behavior, _registry.Services[existingServiceT]);
+                        break;
+                    case BehaviorCategory.View:
+                        Inject(behavior, _registry.Services[existingServiceT]);
                         break;
                 }
             }
 
-            
-            /*foreach (Type type in _registry.Views.Keys) {
-                foreach (var view in _registry.Views[type]) {
+            //View <--> View
+            foreach (Type type in _registry.Views.Keys) {
+                foreach (var existingView in _registry.Views[type]) {
+                    if (behavior == existingView) {
+                        continue;
+                    }
                     switch (behaviorCategory) {
-                        case BehaviorCategory.Controller:
-                            Inject(view, behavior);
+                        case BehaviorCategory.View:
+                            Inject(existingView, behavior);
+                            Inject(behavior, existingView);
                             break;
                     }
                 }
-            }*/
+            }
 
                 return true;
         }
@@ -119,75 +138,60 @@ namespace HQDotNet
             }
         }
 
-        public bool ValidateInjectionRules(Type typeInjectee, Type typeInjector) {
+        public void ValidateInjectionRules(HQCoreBehavior behaviorToInject) {
+            Type behaviorToInjectT = behaviorToInject.GetType();
+            var behaviorToInjectCategory = HQRegistry.GetBehaviorCategory(behaviorToInjectT);
 
-            //switch (true) {
-            //    case true when typeof(HQController<HQControllerModel>).IsAssignableFrom(typeInjector)
-            //}
-
-
-
-
-            /*
-             * Controllers can be injected to:
-             *      -Views
-             *      -Controllers
-             *      
-             * Services can be injected into:
-             *      -Controllers
-             * 
-             * Views can be injected into
-             *      -Other Views? Views really shouoldn't be singletons anyway, so they would need to be named
-             * 
-             * Session:
-             *      Anything
-             *      
-             * Dispatcher:
-             *      For now, anything
-             *      
-             * Registry:
-             *      Nothing for now, only accessed by dispatcher and injector
-             *      
-             * Injector:
-             *      Nothing: Only a single instance in hq
-             * 
-             */
+            var fields = behaviorToInjectT.GetFields(INJECT_BINDING_FLAGS | BindingFlags.DeclaredOnly);
+            foreach (var injecteeField in fields) {
+                var decaredFieldT = injecteeField.FieldType;
 
 
-            //TODO:
-            // This is to validate separation of function
-            // Here we can establish framework rules about how different services may interact
-            /*
-             * Injectees
-             *      -Views
-             *          Controllers:Y, Models:? (are models ever actually injected?
-             *      -Controllers
-             *          DataSources: No, Views: No?, Controllers: Yes
-             *          
-             *  Report an error to the system, something is set up wrong if the get an error
-             *  Something like ValidationError or ConformanceError
-             *          
-             *   InjectionPairs       
-             *  Service -> Controller
-             *  Service -> View
-             *  Controller -> View (View can update controller)
-             *  
-             *     Listeners
-             *  Controller: IModelCollectionListener, IModelListener
-             *  View: IModelListener (Updates when model is updated)
-             *  CollectionView<Tmodel>: IModelCollectionListener<TModel>, IModelListener<TModel>
-             *   
-             *          
-             */
+                switch (behaviorToInjectCategory) {
+                    case BehaviorCategory.Controller:
+                        //1. Thou shalt not inject a Singleton Controller unto itself.
+                        if (decaredFieldT == behaviorToInjectT)
+                            throw new HQInjectionException("A behavior may not be injected into itself.");
 
-            return true;
+                        //5. Thou shalt not inject a View unto a Controller.
+                        if (typeof(HQView).IsAssignableFrom(decaredFieldT))
+                            throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
+
+                        break;
+
+                    case BehaviorCategory.Service:
+
+                        //4. Thou shalt pretect the sanctity of a Service: no behavior shall inject it.
+                        throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
+
+                    case BehaviorCategory.View:
+
+                        //6. Thou shalt not inject a View unto a View of the same type.
+                        if (decaredFieldT == behaviorToInjectT)
+                            throw new HQInjectionException("A behavior may not be injected into itself.");
+
+                        //?. Thou shalt not inject a Controller unto a View.
+                        if (typeof(HQController).IsAssignableFrom(decaredFieldT))
+                            throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
+
+                        //3. Thou shalt not inject a Service unto a View.
+                        //if (typeof(HQService).IsAssignableFrom(injecteeT))
+                        //    throw new HQInjectionException(injecteeT, injectorT);
+
+                        break;
+
+                    default:
+                        //7. Thou shalt not enter the inner injection sanctum unless you are a Controller, Service, or View
+                        throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
+                }
+            }
         }
 
         private void Inject(HQObject injectee, HQObject injector) {
 
             //Stop injecting yourself. Stop injecting yourself.
             if (injectee == injector)
-                return;
+                throw new HQInjectionException("An object may not be injected into itself.");
 
             Type injecteeType = injectee.GetType();
             Type injectorType = injector.GetType();
@@ -199,13 +203,6 @@ namespace HQDotNet
             //If we ever decide to support other MemberTypes here, the logic will need to account for this below.
             MemberInfo[] injectableMembers = injecteeType.FindMembers(MemberTypes.Field, INJECT_BINDING_FLAGS, filter, injectorType);
             foreach(MemberInfo member in injectableMembers) {
-
-
-                //Enforce our separation-of-function rules
-                //If injectee has declared an [HQInject] method that does conform with the ruleset, it needs a refactor.
-                if (!ValidateInjectionRules(injecteeType, injectorType))
-                    continue;
-
                 //Only inject with [HQInject]
                 if (member.GetCustomAttribute<HQInject>() == null)
                     continue;

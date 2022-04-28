@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 
 namespace HQDotNet.Test {
-    public class DummyModuleController: HQController {
+    public class DummyModuleController2: HQController {
 
         [HQInject]
         private DummyModuleService _service;
 
         [HQInject]
-        private DummyModuleController2 _controller;
+        private DummyModuleController _controller;
 
         public bool HasService() {
             return _service != null;

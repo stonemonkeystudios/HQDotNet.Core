@@ -7,15 +7,15 @@ namespace HQDotNet.Test {
 
         //Invalid
         [HQInject]
-        private DummyModuleControllerInvalid _controller;
+        private DummyModuleController _controller;
 
         //Invalid
         [HQInject]
-        private DummyModuleServiceInvalid _service;
+        private DummyModuleService _service;
 
         //Invalid
         [HQInject]
-        private DummyModuleViewInvalid _view;
+        private DummyModuleView _view;
 
         public bool HasController() {
             return _controller != null;

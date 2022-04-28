@@ -7,7 +7,7 @@ namespace HQDotNet {
     /// [HQInject] is an attribute to be used for private fields on an HQBehavior
     /// It indicates to HQ that we should attempt to inject a registered behavior into the variable
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public class HQInject : Attribute {
         public HQInject() {}
 

@@ -1,14 +1,14 @@
 ﻿using HQDotNet.Model;
 
 namespace HQDotNet.Test {
-    public class DummyModuleView : HQView, IModelListener<DummyData>{
+    public class DummyModuleView2 : HQView, IModelListener<DummyData>{
 
         [HQInject]
         private DummyModuleService _service;
 
         //Views can be Multitons
         [HQInject]
-        private DummyModuleView2 _view;
+        private DummyModuleView _view;
 
         public string DisplayString { get; private set; }
 

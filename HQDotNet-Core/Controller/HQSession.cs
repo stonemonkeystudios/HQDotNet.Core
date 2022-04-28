@@ -32,12 +32,12 @@ namespace HQDotNet {
     public class HQSession : HQController{
 
         private static HQSession _current;
-        private HQDispatcher _dispatcher;
-        private HQInjector _injector;
-        private HQRegistry _registry;
+        private readonly HQDispatcher _dispatcher;
+        private readonly HQInjector _injector;
+        private readonly HQRegistry _registry;
 
         //To be in model
-        private System.DateTime _startDate;
+        private readonly System.DateTime _startDate;
 
         public static HQSession Current {
             get {
@@ -180,12 +180,11 @@ namespace HQDotNet {
         }
 
         private void DispatchPhaseUpdated() {
-            HQDispatcher.DispatchMessageDelegate<ISessionListener> dispatchMessage = 
-                (ISessionListener sessionListener) => { 
-                    return () => sessionListener.PhaseUpdated(Phase); 
-                };
+            System.Action dispatchMessage(ISessionListener sessionListener) {
+                return () => sessionListener.PhaseUpdated(Phase);
+            }
 
-            _dispatcher.Dispatch(dispatchMessage);
+            _dispatcher.Dispatch((HQDispatcher.DispatchMessageDelegate<ISessionListener>)dispatchMessage);
         }
 
         /// <summary>
@@ -268,7 +267,6 @@ namespace HQDotNet {
             }
 
             _injector.Shutdown();
-            _injector = null;
 
             bool success = allShutDown && base.Shutdown();
             return success;

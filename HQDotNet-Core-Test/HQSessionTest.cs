@@ -28,8 +28,8 @@ namespace HQDotNet.Test {
         public async Task SimpleSessionTest() {
             string dummyTitleString = "DummyTitle";
             var controller = _session.RegisterController<DummyModuleController>();
-            var service = _session.RegisterService<DummyModuleService>();
             var view = _session.RegisterView<DummyModuleView>();
+            _session.RegisterService<DummyModuleService>();
 
             //View's display string is initially null
             Assert.IsNull(view.DisplayString);
@@ -51,8 +51,8 @@ namespace HQDotNet.Test {
         public async Task SessionTestLoopedServiceQuery() {
             string dummyTitleString = "DummyTitle";
             var controller = _session.RegisterController<DummyModuleController>();
-            var service = _session.RegisterService<DummyModuleService>();
             var view = _session.RegisterView<DummyModuleView>();
+            _session.RegisterService<DummyModuleService>();
 
 
             for (int i = 0; i < 10000; i++) {

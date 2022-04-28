@@ -5,18 +5,10 @@ namespace HQDotNet.Test {
 
         //Invalid
         [HQInject]
-        private DummyModuleServiceInvalid _service;
+        private DummyModuleController _controller;
 
-        //Invalid
-        [HQInject]
-        private DummyModuleViewInvalid _view;
-
-        public bool HasService() {
-            return _service != null;
-        }
-
-        public bool HasView() {
-            return _view != null;
+        public bool HasController() {
+            return _controller != null;
         }
 
         public string DisplayString { get; private set; }
