@@ -10,23 +10,24 @@ namespace HQDotNet.Unity
 
         new HQModelCollectionView<ICollection<object>, object, HQView> view;
 
-        public virtual void OnModelAdded(object model) {
+        void Awake() {
+            if (HQSession.HasSession) {
+                view = HQSession.Current.RegisterView<HQModelCollectionView<ICollection<object>, object, HQView>>();
+            }
         }
 
-        public virtual void OnModelDeleted(object model) {
+        public virtual void OnModelAdded(ref object model) {
+
+        }
+
+        public virtual void OnModelDeleted(ref object model) {
             if (_modelViewBindings.ContainsKey(model)) {
                 Destroy(_modelViewBindings[model]);
                 _modelViewBindings.Remove(model);
             }
         }
 
-        public virtual void OnModelUpdated(object model) {
-        }
-
-        void Awake() {
-            if (HQSession.HasSession) {
-                view = HQSession.Current.RegisterView<HQModelCollectionView<ICollection<object>, object, HQView>>();
-            }
+        public virtual void OnModelUpdated(ref object model) {
         }
     }
 }
