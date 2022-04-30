@@ -1,0 +1,25 @@
+{
+  "name": "com.stonemonkeystudios.hqdotnet-unity",
+  "version": "1.2.3",
+  "displayName": "Package Example",
+  "description": "This is an example package",
+  "unity": "2021.2",
+  "unityRelease": "17f1",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+ "keywords": [
+    "DependencyInjection",
+  ],
+  "author": {
+    "name": "Stone Monkey Studios",
+    "email": "stonemonkeygames@gmail.com",
+  },
+  "samples": [
+        {
+            "displayName": "PrefabCollectionView",
+            "description": "Contains a sample PrefabCollectionView",
+            "path": "Samples~/SamplesPrefabCollectionView"
+        }
+    ]
+}
