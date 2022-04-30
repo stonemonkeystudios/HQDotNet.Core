@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace HQDotNet
 {
@@ -16,7 +17,7 @@ namespace HQDotNet
      * 
      */
 
-    public sealed class HQDispatcher : HQController{
+    public sealed class HQDispatcher : HQCoreBehavior{
 
         //TODO: Dispatcher should queue up all dispatches to be executed in a (new) LateUpdate method.
         //Any other threads that need to dispatch should register here and will be dispatched later
@@ -39,6 +40,7 @@ namespace HQDotNet
             //Iterate all listener types on the given object
             Type listenerType = listenerObject.GetType();
             Type baseDispatchListenerType = typeof(IDispatchListener);
+
             if (!baseDispatchListenerType.IsAssignableFrom(listenerType)) {
                 return;
             }
@@ -73,17 +75,22 @@ namespace HQDotNet
         public delegate Action DispatchMessageDelegate<TDispatchListener>(TDispatchListener dispatchListener);
         public void Dispatch<TDispatchListener>(DispatchMessageDelegate<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
 
-            var listeners = _registry.GetDispatchListenersForType<TDispatchListener>();
-            foreach(var listener in listeners) {
-                _pendingDispatch.Enqueue(dispatchMessage((TDispatchListener)listener));
+            lock (_pendingDispatch) {
+                var listeners = _registry.GetDispatchListenersForType<TDispatchListener>();
+                foreach (var listener in listeners) {
+                    _pendingDispatch.Enqueue(dispatchMessage((TDispatchListener)listener));
+                }
             }
         }
 
+        //[MethodImpl(MethodImplOptions.Synchronized)]
         private void ExecuteDispatchQueue() {
-            Action dequeuedAction;
-            if (_pendingDispatch != null) {
-                while (_pendingDispatch.TryDequeue(out dequeuedAction)) {
-                    dequeuedAction();
+            lock (_pendingDispatch) {
+                Action dequeuedAction;
+                if (_pendingDispatch != null) {
+                    while (_pendingDispatch.TryDequeue(out dequeuedAction)) {
+                        dequeuedAction();
+                    }
                 }
             }
         }

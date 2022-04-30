@@ -11,90 +11,65 @@ namespace HQDotNet.Test {
      */
 
     public class HQDispatcherTest {
-
-        private HQRegistry _registry;
-        private HQDispatcher _dispatcher;
-        private HQInjector _injector;
+        private HQSession _session;
 
         [SetUp]
         public void Setup() {
-            _registry = new HQRegistry();
-            _injector = new HQInjector();
-            _dispatcher = new HQDispatcher();
-            _injector.SetRegistry(_registry);
-            _dispatcher.SetRegistry(_registry);
+            _session = new HQSession();
+            _session.Startup();
         }
 
         [TearDown]
         public void Teardown() {
-            _dispatcher = null;
+            _session = null;
         }
 
         [Test]
         public void InstantiationTestSimple() {
-            Assert.NotNull(_dispatcher);
+            Assert.NotNull(_session.Dispatcher);
         }
 
         [Test]
         public async Task DelayedServiceDispatchTest() {
-            DummyModuleView view = new DummyModuleView();
-            DummyModuleController controller = new DummyModuleController();
-            DummyModuleService service = new DummyModuleService();
-
-            _registry.RegisterController(_dispatcher);
-
-            _registry.RegisterController(controller);
-            _registry.RegisterView(view);
-            _registry.RegisterService(service);
-
-            _injector.Inject(controller);
-            _injector.Inject(view);
-            _injector.Inject(service);
-
-            _dispatcher.RegisterDispatchListenersForObject(controller);
-            _dispatcher.RegisterDispatchListenersForObject(view);
-            _dispatcher.RegisterDispatchListenersForObject(service);
+            var view = _session.RegisterView<DummyModuleView>();
+            var controller = _session.RegisterController<DummyModuleController>();
+            _session.RegisterService<DummyModuleService>();
 
             Assert.IsNull(view.DisplayString);
             Assert.True(controller.HasService());
+
+            //Does nothing, but simulating flow of control
+            _session.Update();
 
             string dummyTitleString = "DummyTitle";
 
             await controller.QueryDummyDelayedServiceForData(dummyTitleString);
 
-            _dispatcher.LateUpdate();
+            //Actually dispatches a message queued in the call above.
+            //We are awaiting it here, but in practice, a real dispatch might be queued in a few frames
+            _session.LateUpdate();
 
             Assert.AreEqual(dummyTitleString, view.DisplayString);
         }
 
         [Test]
         public async Task ImmediateServiceDispatchTest() {
-            DummyModuleView view = new DummyModuleView();
-            DummyModuleController controller = new DummyModuleController();
-            DummyModuleService service = new DummyModuleService();
-
-            _registry.RegisterController(_dispatcher);
-
-            _registry.RegisterController(controller);
-            _registry.RegisterView(view);
-            _registry.RegisterService(service);
-
-            _injector.Inject(controller);
-            _injector.Inject(view);
-            _injector.Inject(service);
-
-            _dispatcher.RegisterDispatchListenersForObject(controller);
-            _dispatcher.RegisterDispatchListenersForObject(view);
-            _dispatcher.RegisterDispatchListenersForObject(service);
+            var view = _session.RegisterView<DummyModuleView>();
+            var controller = _session.RegisterController<DummyModuleController>();
+            _session.RegisterService<DummyModuleService>();
 
             Assert.IsNull(view.DisplayString);
             Assert.True(controller.HasService());
+
+            //Does nothing, but simulating flow of control
+            _session.Update();
 
             string dummyTitleString = "DummyTitle";
 
             await controller.QueryDummyImmediateServiceForData(dummyTitleString);
 
-            _dispatcher.LateUpdate();
+            //Actually dispatch occurs on main thread in LateUpdate
+            _session.Dispatcher.LateUpdate();
 
             Assert.AreEqual(dummyTitleString, view.DisplayString);
         }

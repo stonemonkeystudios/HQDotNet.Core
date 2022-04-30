@@ -10,11 +10,11 @@ namespace HQDotNet {
     public abstract class HQCoreBehavior: HQObject{
         public HQPhase Phase { get; protected set; }
 
-        [HQInject]
-        protected HQSession session; //The session this behavior lives in
+        public HQSession Session { get; private set; } //The session this behavior lives in
 
-        [HQInject]
-        protected HQDispatcher dispatcher;
+        public void SetSession(HQSession session) {
+            Session = session;
+        }
 
         /// <summary>
         /// Shuts down this behavior and unregisters itself from a session

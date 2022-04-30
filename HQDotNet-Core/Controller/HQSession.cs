@@ -29,7 +29,7 @@ namespace HQDotNet {
     /// All behaviors inheriting from <see cref="HQStateBehavior"/> are housed in <see cref="HQSessionModel.Behaviors"/>
     /// </summary>
     /// 
-    public class HQSession : HQController{
+    public class HQSession : HQCoreBehavior{
 
         private static HQSession _current;
         private readonly HQDispatcher _dispatcher;
@@ -52,9 +52,6 @@ namespace HQDotNet {
             _injector = new HQInjector();
             _dispatcher = new HQDispatcher();
 
-            _registry.RegisterController(this);
-            _registry.RegisterController(_dispatcher);
-
             //Use a method rather than injection for these
             //Since only this class should be mediating
             _injector.SetRegistry(_registry);
@@ -69,6 +66,8 @@ namespace HQDotNet {
         public System.TimeSpan TimeSinceStarted {
             get { return System.DateTime.Now - _startDate; }
         }
+
+        public HQDispatcher Dispatcher { get { return _dispatcher; } }
 
         /// <summary>
         /// Initialize HQ and prepare for battle
@@ -100,6 +99,7 @@ namespace HQDotNet {
 
             _dispatcher.RegisterDispatchListenersForObject(controller);
             _injector.Inject( controller);
+            controller.SetSession(this);
             return controller;
         }
 
@@ -116,6 +116,7 @@ namespace HQDotNet {
 
             _dispatcher.RegisterDispatchListenersForObject(service);
             _injector.Inject(service);
+            service.SetSession(this);
             return service;
         }
 
@@ -128,6 +129,7 @@ namespace HQDotNet {
 
             _dispatcher.RegisterDispatchListenersForObject(view);
             _injector.Inject(view);
+            view.SetSession(this);
             return view;
         }
 
@@ -147,7 +149,9 @@ namespace HQDotNet {
         /// </summary>
         /// <returns></returns>
         public override bool Startup() {
-            bool allStarted = _dispatcher.Startup();
+            bool allStarted =   _registry.Startup() &&
+                                _injector.Startup() &&
+                                _dispatcher.Startup();
 
             //Servies
             foreach (var service in _registry.Services.Values) {
@@ -158,7 +162,7 @@ namespace HQDotNet {
 
             //Controllers
             foreach(var controller in _registry.Controllers.Values) {
-                if(controller != this && controller.Phase == HQPhase.Initialized) {
+                if(controller.Phase == HQPhase.Initialized) {
                     allStarted &= controller.Startup();
                 }
             }
@@ -194,6 +198,10 @@ namespace HQDotNet {
             //Run startup
             Startup();
 
+            _registry.Update();
+            _injector.Update();
+            _dispatcher.Update();
+
             if(Phase == HQPhase.Started) {
                 //Servies
                 foreach (var service in _registry.Services.Values) {
@@ -202,8 +210,7 @@ namespace HQDotNet {
 
                 //Controllers
                 foreach (var controller in _registry.Controllers.Values) {
-                    if(controller != this)
-                        controller.Update();
+                    controller.Update();
                 }
 
                 //Views
@@ -221,6 +228,9 @@ namespace HQDotNet {
         /// Internally updates our Master Controllers
         /// </summary>
         public override void LateUpdate() {
+            _registry.LateUpdate();
+            _injector.LateUpdate();
+            _dispatcher.LateUpdate();
 
             if (Phase == HQPhase.Started) {
                 //Servies
@@ -230,8 +240,7 @@ namespace HQDotNet {
 
                 //Controllers
                 foreach (var controller in _registry.Controllers.Values) {
-                    if(controller != this)
-                        controller.LateUpdate();
+                    controller.LateUpdate();
                 }
 
                 //Views
@@ -255,8 +264,7 @@ namespace HQDotNet {
 
             //Controllers
             foreach (var controller in _registry.Controllers.Values) {
-                if(controller != this)
-                    allShutDown &= controller.Shutdown();
+                allShutDown &= controller.Shutdown();
             }
 
             //Views
@@ -266,7 +274,9 @@ namespace HQDotNet {
                 }
             }
 
-            _injector.Shutdown();
+            allShutDown &= _registry.Shutdown() &&
+                           _injector.Shutdown() &&
+                           _dispatcher.Shutdown();
 
             bool success = allShutDown && base.Shutdown();
             return success;
