@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20c8330ccdd029042bf5d2819c7cbb89, type: 3}
-  m_Name: SampleMeshModel
+  m_Script: {fileID: 11500000, guid: bff99deadf6e6f84e87a057d9ec57436, type: 3}
+  m_Name: InstancedMeshDemoSettings
   m_EditorClassIdentifier: 
-  mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  material: {fileID: 2100000, guid: 1ce1b707f3636514286bd0ae25c624b8, type: 2}
+  waitBetweenSpawn: 0.01
+  numberToSpawn: 1
+  randomRadius: 10
+  minScale: 0.5
+  maxScale: 2

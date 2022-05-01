@@ -16,7 +16,19 @@ namespace HQDotNet.Unity {
             if (_model == null)
                 return;
 
-            Graphics.DrawMeshInstanced(_model.mesh, 0, _model.material, _transformService.LocalCollection.ToArray());
+
+            int i = 0;
+            while (i < _transformService.LocalCollection.Count) {
+                int end = i + 1024;
+                if(_transformService.LocalCollection.Count < end) {
+                    end = _transformService.LocalCollection.Count;
+                }
+                Graphics.DrawMeshInstanced(_model.mesh, 0, _model.material, _transformService.LocalCollection.GetRange(i, end - i - 1));
+                i = end;
+            }
+
+
+            //Graphics.DrawMeshInstanced(_model.mesh, 0, _model.material, _transformService.LocalCollection.ToArray());
 
             base.LateUpdate();
         }

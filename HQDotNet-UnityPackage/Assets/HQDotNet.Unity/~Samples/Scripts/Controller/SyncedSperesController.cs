@@ -1,30 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using HQDotNet.Unity.Model;
 
 namespace HQDotNet.Unity {
-    public class SyncedSperesController : HQController {
-        //Should be in a model, but it's a simple test;
-        public float waitBetweenSpawn = .5f;
-        public int numberToSpawn = 1;
-        public float randomRadius = 10f;
-        public float minScale = .5f;
-        public float maxScale = 2f;
-
-        private System.DateTime nextSpawnTime;
+    public class SyncedSperesController : HQController, IModelListener<MeshDemoSettings> {
 
         [HQInject]
         private TransformCollectionService _transformCollectionService;
 
-        public SyncedSperesController() {
-            nextSpawnTime = System.DateTime.Now.AddSeconds(waitBetweenSpawn);
-        }
+        private System.DateTime nextSpawnTime = new System.DateTime();
+
+        private MeshDemoSettings _settings;
 
         public override void Update() {
+            if (_settings == null)
+                return;
 
             if (System.DateTime.Now > nextSpawnTime) {
-                var pos = Random.insideUnitSphere * randomRadius;
-                float fScale = Random.Range(minScale, maxScale);
+                var pos = Random.insideUnitSphere * _settings.randomRadius;
+                float fScale = Random.Range(_settings.minScale, _settings.maxScale);
                 var scale = new Vector3(fScale, fScale, fScale);
 
 
@@ -32,11 +27,14 @@ namespace HQDotNet.Unity {
                 newMatrix.SetTRS(pos, Quaternion.identity, scale);
                 _transformCollectionService.Add(newMatrix);
 
-                nextSpawnTime = System.DateTime.Now.AddSeconds(waitBetweenSpawn);
+                nextSpawnTime = System.DateTime.Now.AddSeconds(_settings.waitBetweenSpawn);
             }
 
-
             base.Update();
+        }
+
+        void IModelListener<MeshDemoSettings>.OnModelUpdated(ref MeshDemoSettings model) {
+            _settings = model;
         }
     }
 }

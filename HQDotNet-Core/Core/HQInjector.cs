@@ -142,8 +142,12 @@ namespace HQDotNet
             Type behaviorToInjectT = behaviorToInject.GetType();
             var behaviorToInjectCategory = HQRegistry.GetBehaviorCategory(behaviorToInjectT);
 
+
             var fields = behaviorToInjectT.GetFields(INJECT_BINDING_FLAGS | BindingFlags.DeclaredOnly);
             foreach (var injecteeField in fields) {
+                if (injecteeField.GetCustomAttribute<HQInject>() == null)
+                    continue;
+
                 var decaredFieldT = injecteeField.FieldType;
 
 

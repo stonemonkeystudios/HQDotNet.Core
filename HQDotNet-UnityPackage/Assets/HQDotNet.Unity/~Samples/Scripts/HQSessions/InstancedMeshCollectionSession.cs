@@ -6,6 +6,7 @@ using HQDotNet.Unity.Model;
 namespace HQDotNet.Unity {
     public class InstancedMeshCollectionSession : MonoBehaviour {
         public MeshViewModel meshViewModel;
+        public MeshDemoSettings sphereDemoSettingsModel;
 
         private HQSession _session;
 
@@ -16,7 +17,7 @@ namespace HQDotNet.Unity {
             _session.RegisterView<DrawMeshInstancedCollectionView>();
 
             DispatchViewUpdate();
-
+            DispatchDemoModelUpdate();
         }
         public void Update() {
             _session.Update();
@@ -37,6 +38,16 @@ namespace HQDotNet.Unity {
             }
 
             _session.Dispatcher.Dispatch((HQDispatcher.DispatchMessageDelegate<IModelListener<MeshViewModel>>)dispatchMessage);
+
+        }
+
+        private void DispatchDemoModelUpdate() {
+
+            System.Action dispatchMessage(IModelListener<MeshDemoSettings> modelListener) {
+                return () => modelListener.OnModelUpdated(ref sphereDemoSettingsModel);
+            }
+
+            _session.Dispatcher.Dispatch((HQDispatcher.DispatchMessageDelegate<IModelListener<MeshDemoSettings>>)dispatchMessage);
 
         }
 

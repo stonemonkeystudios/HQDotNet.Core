@@ -75,9 +75,16 @@ namespace HQDotNet
         public delegate Action DispatchMessageDelegate<TDispatchListener>(TDispatchListener dispatchListener);
         public void Dispatch<TDispatchListener>(DispatchMessageDelegate<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
 
-            lock (_pendingDispatch) {
-                var listeners = _registry.GetDispatchListenersForType<TDispatchListener>();
-                foreach (var listener in listeners) {
+            //Immediate dispatch
+
+            var listeners = _registry.GetDispatchListenersForType<TDispatchListener>();
+            foreach (var listener in listeners) {
+
+                //dispatchMessage((TDispatchListener)listener);
+                //continue;
+
+                //Delayed
+                lock (_pendingDispatch) {
                     _pendingDispatch.Enqueue(dispatchMessage((TDispatchListener)listener));
                 }
             }
