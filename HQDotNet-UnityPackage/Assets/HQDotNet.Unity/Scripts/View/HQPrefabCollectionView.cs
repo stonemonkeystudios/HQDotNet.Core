@@ -6,7 +6,7 @@ namespace HQDotNet.Unity
     public class HQPrefabCollectionView : HQMonoBehaviourCollectionView{
         public GameObject prefab;
 
-        public override void OnModelAdded(object model) {
+        public override void OnModelAdded(ref object model) {
             Assert.IsNotNull(model);
 
             GameObject go = Instantiate(prefab);

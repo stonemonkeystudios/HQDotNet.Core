@@ -8,7 +8,7 @@
     <Configurations>Debug;Release;UnityRelease</Configurations>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
-	  <Version>2022.1.1-alpha</Version>
+	  <Version>2022.1.2-alpha</Version>
 	  <PackageId>HQDotNet.Core</PackageId>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

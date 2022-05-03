@@ -1,4 +1,4 @@
-copy %~dp0HQDotNet-Core\bin\Release\netstandard2.1\*.dll %~dp0HQDotNet-UnityPackage\Assets\HQDotNet.Unity\Runtime\lib\
+copy %~dp0HQDotNet-Core\bin\Release\netstandard2.1\*.dll %~dp0HQDotNet-UnityPackage\Assets\HQDotNet.Unity\Plugins\lib\
 echo "Libraries copied to Unity Package project."
 
 ::Unity >nul 2>&1 && (
