@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
@@ -8,7 +8,9 @@
     <Configurations>Debug;Release;UnityRelease</Configurations>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
-    <FileVersion>0.1.1</FileVersion>
+	  <Version>2022.1.2-alpha</Version>
+	  <PackageId>HQDotNet.Core</PackageId>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,6 +37,14 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+	  <None Include="..\LICENSE.txt">
+		  <Pack>True</Pack>
+		  <PackagePack></PackagePack>
+	  </None>
   </ItemGroup>
 
   <ItemGroup>

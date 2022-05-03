@@ -10,14 +10,7 @@ namespace HQDotNet.Unity
 
         new HQModelCollectionView<ICollection<object>, object, HQView> view;
 
-        void Awake() {
-            if (HQSession.HasSession) {
-                view = HQSession.Current.RegisterView<HQModelCollectionView<ICollection<object>, object, HQView>>();
-            }
-        }
-
         public virtual void OnModelAdded(ref object model) {
-
         }
 
         public virtual void OnModelDeleted(ref object model) {
@@ -28,6 +21,12 @@ namespace HQDotNet.Unity
         }
 
         public virtual void OnModelUpdated(ref object model) {
+        }
+
+        void Awake() {
+            if (HQSession.HasSession) {
+                view = HQSession.Current.RegisterView<HQModelCollectionView<ICollection<object>, object, HQView>>();
+            }
         }
     }
 }
