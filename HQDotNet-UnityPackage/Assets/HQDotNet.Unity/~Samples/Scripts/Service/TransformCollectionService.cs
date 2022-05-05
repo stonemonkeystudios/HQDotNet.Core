@@ -10,7 +10,7 @@ namespace HQDotNet.Unity {
             LocalCollection = new List<Matrix4x4>();
         }
 
-        public void Add(Matrix4x4 matrix) {
+        public virtual void Add(Matrix4x4 matrix) {
 
             LocalCollection.Add(matrix);
 
@@ -32,12 +32,12 @@ namespace HQDotNet.Unity {
             Session.Dispatcher.Dispatch(dispatchDelegate);
         }
 
-        public void Add() {
+        public virtual void Add() {
             var newMatrix = new Matrix4x4();
             Add(newMatrix);
         }
 
-        public void Remove(ref IndexedDataModel<Matrix4x4> modelToRemove) {
+        public virtual void Remove(ref IndexedDataModel<Matrix4x4> modelToRemove) {
             //TODO
             throw new System.NotImplementedException();
         }

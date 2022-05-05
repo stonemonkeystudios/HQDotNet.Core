@@ -8,9 +8,9 @@ namespace HQDotNet.Unity {
         public MeshViewModel meshViewModel;
         public MeshDemoSettings sphereDemoSettingsModel;
 
-        private HQSession _session;
+        protected HQSession _session;
 
-        public void Awake() {
+        public virtual void Awake() {
             _session = new HQSession();
             _session.RegisterController<SyncedSperesController>();
             _session.RegisterService<TransformCollectionService>();
@@ -19,19 +19,19 @@ namespace HQDotNet.Unity {
             DispatchViewUpdate();
             DispatchDemoModelUpdate();
         }
-        public void Update() {
+        public virtual void Update() {
             _session.Update();
         }
 
-        public void LateUpdate() {
+        public virtual void LateUpdate() {
             _session.LateUpdate();
         }
 
-        public void OnDestroy() {
+        public virtual void OnDestroy() {
             _session.Shutdown();
         }
 
-        private void DispatchViewUpdate() {
+        protected void DispatchViewUpdate() {
 
             System.Action dispatchMessage(IModelListener<MeshViewModel> modelListener) {
                 return () => modelListener.OnModelUpdated(ref meshViewModel);
@@ -41,7 +41,7 @@ namespace HQDotNet.Unity {
 
         }
 
-        private void DispatchDemoModelUpdate() {
+        protected void DispatchDemoModelUpdate() {
 
             System.Action dispatchMessage(IModelListener<MeshDemoSettings> modelListener) {
                 return () => modelListener.OnModelUpdated(ref sphereDemoSettingsModel);

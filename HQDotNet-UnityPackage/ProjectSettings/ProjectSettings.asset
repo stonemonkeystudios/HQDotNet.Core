@@ -134,7 +134,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 1.0
+  bundleVersion: 0.1
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -155,7 +155,7 @@ PlayerSettings:
   applicationIdentifier:
     Standalone: com.stonemonkeystudios.hqdotnet-unity
   buildNumber:
-    Standalone: 0
+    Standalone: 2
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
