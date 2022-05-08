@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace HQDotNet.Test {
     public class DummyModuleService : HQService{
-
+        public System.Collections.Generic.List<int> list = new System.Collections.Generic.List<int>();
         public async Task AsyncDummyDelayedServiceCall(string newTitle, Action<DummyData> dataRetrievedCallback) {
             await Busywork(newTitle, dataRetrievedCallback);
         }

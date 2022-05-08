@@ -141,14 +141,15 @@ namespace HQDotNet
         public void ValidateInjectionRules(HQCoreBehavior behaviorToInject) {
             Type behaviorToInjectT = behaviorToInject.GetType();
             var behaviorToInjectCategory = HQRegistry.GetBehaviorCategory(behaviorToInjectT);
+            MemberFilter filter = new MemberFilter(InjectionMemberFilter);
 
-
-            var fields = behaviorToInjectT.GetFields(INJECT_BINDING_FLAGS | BindingFlags.DeclaredOnly);
-            foreach (var injecteeField in fields) {
-                if (injecteeField.GetCustomAttribute<HQInject>() == null)
+            FieldInfo[] injectableMembers = behaviorToInject.GetType().GetFields(INJECT_BINDING_FLAGS);
+            foreach (FieldInfo member in injectableMembers) {
+                if (member.GetCustomAttribute<HQInject>() == null) {
                     continue;
+                }
 
-                var decaredFieldT = injecteeField.FieldType;
+                var decaredFieldT = member.FieldType;// .ReflectedType;// .GetType();//.FieldType;
 
 
                 switch (behaviorToInjectCategory) {
@@ -223,5 +224,6 @@ namespace HQDotNet
             bool success = ((FieldInfo)memberInfo).FieldType.IsAssignableFrom(injectorType);
             return success;
         }
+
     }
 }
