@@ -31,7 +31,7 @@ namespace HQDotNet.Test {
 
         private void DispatchOnModelUpdated(DummyData data) {
             Session.Dispatcher.Dispatch((IModelListener<DummyData> modelListener) => {
-                return () => modelListener.OnModelUpdated(ref data);
+                return () => modelListener.OnModelUpdated(data);
             });
         }
     }

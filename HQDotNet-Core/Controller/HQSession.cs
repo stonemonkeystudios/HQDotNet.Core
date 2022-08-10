@@ -133,8 +133,14 @@ namespace HQDotNet {
             return view;
         }
 
-        public void Unregister<TBehavior>() where TBehavior : HQCoreBehavior, new() {
-            throw new System.NotImplementedException();
+        public void RegisterObjectOnlyForDispatch(object obj) {
+            _dispatcher.RegisterDispatchListenersForObject(obj);
+        }
+
+        //TODO: Add an option to register or unregister only one type of interface. maybe in dispatcher itself
+
+        public void UnregisterNonHQBehaviorDispatch(object obj) {
+            _dispatcher.UnregisterDispatchListenersForObject(obj);
         }
 
         public void Unregister(HQCoreBehavior behavior) {
@@ -184,11 +190,7 @@ namespace HQDotNet {
         }
 
         private void DispatchPhaseUpdated() {
-            System.Action dispatchMessage(ISessionListener sessionListener) {
-                return () => sessionListener.PhaseUpdated(Phase);
-            }
-
-            _dispatcher.Dispatch((HQDispatcher.DispatchMessageDelegate<ISessionListener>)dispatchMessage);
+            _dispatcher.Dispatch<ISessionListener>((listener) => listener.PhaseUpdated(Phase));
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace HQDotNet.Test {
             return _view != null;
         }
 
-        void IModelListener<DummyData>.OnModelUpdated(ref DummyData model) {
+        void IModelListener<DummyData>.OnModelUpdated(DummyData model) {
             DisplayString = model.title;
         }
     }

@@ -15,7 +15,32 @@ namespace HQDotNet.Unity
                 go.AddComponent<HQMonoBehaviourView>();
             }
             _modelViewBindings.Add(model, monoView);
+            monoView.UpdateModel(ref model);
             Debug.Log("Added a new view for model named " + go.name);
+            base.OnModelAdded(ref model);
+        }
+
+        public override void OnModelUpdated(ref object model) {
+            base.OnModelUpdated(ref model);
+            var monoView = _modelViewBindings[model];
+            if (monoView == null) {
+            }
+
+            monoView.UpdateModel(ref model);
+
+        }
+
+        public override void OnModelDeleted(ref object model) {
+            Assert.IsNotNull(model);
+            Assert.IsTrue(_modelViewBindings.ContainsKey(model));
+
+            var monoView = _modelViewBindings[model];
+            Assert.IsNotNull(monoView);
+
+            _modelViewBindings.Remove(model);
+            Destroy(monoView);
+
+            base.OnModelDeleted(ref model);
         }
 
         private void Start() {

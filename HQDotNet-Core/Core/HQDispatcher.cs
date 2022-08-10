@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
@@ -41,15 +42,15 @@ namespace HQDotNet
             Type listenerType = listenerObject.GetType();
             Type baseDispatchListenerType = typeof(IDispatchListener);
 
-            if (!baseDispatchListenerType.IsAssignableFrom(listenerType)) {
-                return;
-            }
-
             Type[] interfaceTypes = listenerType.FindInterfaces(DispatchListenerFilter, listenerObject);
             foreach(Type interfaceType in interfaceTypes) {
                 var listener = listenerObject;
                 _registry.BindListener(interfaceType, (IDispatchListener)listenerObject);
             }
+        }
+
+        public List<TListener> GetListeners<TListener>() where TListener : IDispatchListener{
+            return _registry.GetDispatchListenersForType<TListener>();
         }
 
         public void UnregisterDispatchListenersForObject(object listenerObject) {
@@ -68,8 +69,9 @@ namespace HQDotNet
         }
 
         public void UnregisterDispatchListenerInterface<TListener>(TListener listener)
-            where TListener : HQObject, IDispatchListener {
-            _registry.UnbindAllDispatchListenersForType(typeof(TListener));
+            where TListener : IDispatchListener {
+
+            _registry.UnbindBehaviorListenerForObject(listener);
         }
 
         public delegate Action DispatchMessageDelegate<TDispatchListener>(TDispatchListener dispatchListener);
@@ -90,6 +92,13 @@ namespace HQDotNet
             }
         }
 
+        public void Dispatch<TDispatchListener>(Action<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
+            var listeners = GetListeners<TDispatchListener>();
+            foreach(var listener in listeners) {
+                dispatchMessage(listener);
+            }
+        }
+
         //[MethodImpl(MethodImplOptions.Synchronized)]
         private void ExecuteDispatchQueue() {
             lock (_pendingDispatch) {
@@ -103,7 +112,12 @@ namespace HQDotNet
         }
 
         private bool DispatchListenerFilter(Type type, object criteriaObject) {
-            return typeof(IDispatchListener).IsAssignableFrom(type);
+
+            Type listenerType = criteriaObject.GetType();
+            Type baseDispatchListenerType = typeof(IDispatchListener);
+
+            bool valid = baseDispatchListenerType.IsAssignableFrom(listenerType);
+            return valid;
         }
 
         private static bool ValidateDispatcherRules(Type interfaceType, Type behaviorType) {

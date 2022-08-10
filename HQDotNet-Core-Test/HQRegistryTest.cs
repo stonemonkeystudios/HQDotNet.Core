@@ -257,35 +257,47 @@ namespace HQDotNet.Test {
 
         #region ListenerBinding Tests
 
+        interface IBinderTest : IDispatchListener {
+            void DispatchAction(int newInt);
+        }
+
+        class BinderTest : HQView, IBinderTest {
+            public int myInt;
+
+            public void DispatchAction(int newInt) {
+                this.myInt = newInt;
+            }
+        }
+
         [Test]
         public void BindListenerTest() {
-            HQView view = new HQView();
-            _registry.BindListener(typeof(IModelListener<DummyData>), view);
-            var listeners = _registry.GetDispatchListenersForType<IModelListener<DummyData>>();
+            var view = new BinderTest();
+            _registry.BindListener<IBinderTest>(view);
+            var listeners = _registry.GetDispatchListenersForType<IBinderTest>();
             Assert.AreEqual(1, listeners.Count);
-            Assert.IsTrue(listeners.Contains(view));
+            Assert.IsTrue(listeners.Contains(view as IBinderTest));
         }
 
         [Test]
         public void UnbindListenerTest() {
-            HQView view = new HQView();
-            _registry.BindListener(typeof(IModelListener<DummyData>), view);
-            var listeners = _registry.GetDispatchListenersForType<IModelListener<DummyData>>();
-            _registry.UnbindBehaviorListenerForObject(typeof(IModelListener<DummyData>), view);
-            listeners = _registry.GetDispatchListenersForType<IModelListener<DummyData>>();
+            var view = new BinderTest();
+            _registry.BindListener<IBinderTest>(view);
+            var listeners = _registry.GetDispatchListenersForType<IBinderTest>();
+            _registry.UnbindBehaviorListenerForObject(typeof(IBinderTest), view);
+            listeners = _registry.GetDispatchListenersForType<IBinderTest>();
             Assert.AreEqual(0, listeners.Count);
 
         }
 
         [Test]
         public void UnbindListenerBehaviorTest() {
-            HQView[] views = new HQView[] { new HQView(), new HQView() };
-            _registry.BindListener(typeof(IModelListener<DummyData>), views[0]);
-            _registry.BindListener(typeof(IModelListener<DummyData>), views[1]);
-            var listeners = _registry.GetDispatchListenersForType<IModelListener<DummyData>>();
+            BinderTest[] views = new BinderTest[] { new BinderTest(), new BinderTest() };
+            _registry.BindListener(typeof(IBinderTest), views[0]);
+            _registry.BindListener(typeof(IBinderTest), views[1]);
+            var listeners = _registry.GetDispatchListenersForType<IBinderTest>();
             Assert.AreEqual(2, listeners.Count);
-            _registry.UnbindAllDispatchListenersForType(typeof(IModelListener<DummyData>));
-            listeners = _registry.GetDispatchListenersForType<IModelListener<DummyData>>();
+            _registry.UnbindAllDispatchListenersForType(typeof(IBinderTest));
+            listeners = _registry.GetDispatchListenersForType<IBinderTest>();
             Assert.AreEqual(0, listeners.Count);
 
         }

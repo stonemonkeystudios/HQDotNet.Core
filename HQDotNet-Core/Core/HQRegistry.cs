@@ -90,15 +90,19 @@ namespace HQDotNet {
             }
         }
 
-        public void BindListener <TObjectListener>(Type type, TObjectListener listenerObject) where TObjectListener : IDispatchListener{
-            //Type listenerType = typeof(TListenerBehavior);
+        public void BindListener <TObjectListener>(object listenerObject) where TObjectListener : IDispatchListener{
+            Type listenerType = typeof(TObjectListener);
+            BindListener(listenerType, listenerObject);
+        }
+
+        public void BindListener(Type type, object listenerObject){
 
             if (!_dispatcherBinding.ContainsKey(type)) {
                 _dispatcherBinding.Add(type, new List<IDispatchListener>());
             }
 
             if (!_dispatcherBinding[type].Contains(listenerObject)) {
-                _dispatcherBinding[type].Add(listenerObject);
+                _dispatcherBinding[type].Add((IDispatchListener) listenerObject);
             }
         }
 
@@ -108,10 +112,16 @@ namespace HQDotNet {
             }
         }
 
-        public void UnbindBehaviorListenerForObject <TListenerBehavior>(Type type, TListenerBehavior behavior) where TListenerBehavior : IDispatchListener {
-            if (_dispatcherBinding.ContainsKey(type)) {
-                if (_dispatcherBinding[type].Contains(behavior)) {
-                    _dispatcherBinding[type].Remove(behavior);
+        public void UnbindBehaviorListenerForObject <TListenerBehavior>(TListenerBehavior behavior) where TListenerBehavior : IDispatchListener {
+            Type listenerType = typeof(TListenerBehavior);
+            UnbindBehaviorListenerForObject(listenerType, behavior);
+        }
+
+        public void UnbindBehaviorListenerForObject(Type listenerType, IDispatchListener listener) {
+
+            if (_dispatcherBinding.ContainsKey(listenerType)) {
+                if (_dispatcherBinding[listenerType].Contains(listener)) {
+                    _dispatcherBinding[listenerType].Remove(listener);
                 }
             }
         }
@@ -135,15 +145,20 @@ namespace HQDotNet {
 
         #region Dispatcher Bindings
 
-        public List<IDispatchListener> GetDispatchListenersForType<TDispatchListener>()
+        public List<TDispatchListener> GetDispatchListenersForType<TDispatchListener>()
             where TDispatchListener : IDispatchListener{
 
             Type listenerType = typeof(TDispatchListener);
 
             if (_dispatcherBinding.ContainsKey(listenerType)) {
-                return _dispatcherBinding[listenerType];
+                List<TDispatchListener> converted = new List<TDispatchListener>();
+                foreach(var listener in _dispatcherBinding[listenerType]) {
+                    TDispatchListener convertedListener = (TDispatchListener)listener;
+                    converted.Add(convertedListener);
+                }
+                return converted;
             }
-            return new List<IDispatchListener>();
+            return new List<TDispatchListener>();
         }
 
         #endregion;

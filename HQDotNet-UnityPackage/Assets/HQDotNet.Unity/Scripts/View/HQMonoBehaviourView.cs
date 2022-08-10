@@ -5,27 +5,10 @@ using HQDotNet;
 
 namespace HQDotNet.Unity
 {
-    public class HQMonoBehaviourView : MonoBehaviour, IViewListener<HQView>
+    public class HQMonoBehaviourView : MonoBehaviour
     {
-        protected HQView view;
-        protected bool isDirty = false;
+        public virtual void UpdateModel(ref object model) {
 
-        public void Render() {
-
-        }
-
-        public void SetView<TView>(TView view) where TView : HQView, new(){
-            this.view = view;
-        }
-
-        public virtual void OnViewUpdated(HQView view) {
-        }
-
-        void LateUpdate() {
-            if (isDirty) {
-                Render();
-                isDirty = false;
-            }
         }
     }
 }

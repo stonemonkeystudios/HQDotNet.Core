@@ -26,7 +26,7 @@ namespace HQDotNet {
 
             base.Update();
         }
-        void IModelListener<object>.OnModelUpdated(ref object model) {
+        void IModelListener<object>.OnModelUpdated(object model) {
             Render();
         }
     }

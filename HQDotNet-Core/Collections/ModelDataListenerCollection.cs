@@ -27,7 +27,7 @@ namespace HQDotNet.Model {
             this.ForEach((listener) => listener.OnDataUpdated(modelType, id));
         }*/
 
-        void IModelListener<TModelData>.OnModelUpdated(ref TModelData model) {
+        void IModelListener<TModelData>.OnModelUpdated(TModelData model) {
             throw new NotImplementedException();
         }
     }

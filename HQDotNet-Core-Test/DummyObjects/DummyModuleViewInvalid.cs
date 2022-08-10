@@ -13,7 +13,7 @@ namespace HQDotNet.Test {
 
         public string DisplayString { get; private set; }
 
-        void IModelListener<DummyData>.OnModelUpdated(ref DummyData model) {
+        void IModelListener<DummyData>.OnModelUpdated(DummyData model) {
             System.Console.WriteLine("OnModelUpdated DummyModel: " + model.title);
         }
     }

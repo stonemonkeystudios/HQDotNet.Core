@@ -8,7 +8,7 @@ namespace HQDotNet.View {
         where TView : HQView, IModelListener<TModel>, new(){
         private Dictionary<TModel, TView> _modelViewBindings = new Dictionary<TModel, TView>();
 
-        public void OnModelAdded(ref TModel model){
+        public void OnModelAdded(TModel model){
             if (_modelViewBindings.ContainsKey(model)){
                 Console.WriteLine("View Collection already contains a view for this model.");
                 return;
@@ -19,7 +19,7 @@ namespace HQDotNet.View {
             }
         }
 
-        public void OnModelDeleted(ref TModel model){
+        public void OnModelDeleted(TModel model){
             if (!_modelViewBindings.ContainsKey(model)) {
                 Console.WriteLine("No view is registered for this model.");
                 return;
@@ -29,14 +29,14 @@ namespace HQDotNet.View {
             }
         }
 
-        public void OnModelUpdated(ref TModel model){
+        public void OnModelUpdated(TModel model){
             //Update the specific view associated with this model
             if (!_modelViewBindings.ContainsKey(model)) {
                 Console.WriteLine("No view is registered for this model.");
                 return;
             }
             else {
-                _modelViewBindings[model].OnModelUpdated(ref model);
+                _modelViewBindings[model].OnModelUpdated(model);
             }
         }
     }
