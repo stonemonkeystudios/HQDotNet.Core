@@ -107,27 +107,6 @@ namespace HQDotNet.Test {
         }
 
         [Test]
-        public void InvalidInjection_Controller() {
-            var controller = new DummyModuleControllerInvalid();
-            _registry.RegisterController(controller);
-            Assert.Throws<HQInjectionException>(() => _injector.Inject(controller));
-        }
-
-        [Test]
-        public void InvalidInjection_Service() {
-            var service = new DummyModuleServiceInvalid();
-            _registry.RegisterService(service);
-            Assert.Throws<HQInjectionException>(() => _injector.Inject(service));
-        }
-
-        [Test]
-        public void InvalidInjection_View() {
-            var view = new DummyModuleViewInvalid();
-            _registry.RegisterView(view);
-            Assert.Throws<HQInjectionException>(() => _injector.Inject(view));
-        }
-
-        [Test]
         public void TestPermutationsInterwoven() {
             var behaviors = new HQCoreBehavior[] {
                 new DummyModuleController(),

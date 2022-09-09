@@ -7,6 +7,10 @@ using HQDotNet.Model;
 
 namespace HQDotNet
 {
+    /// <summary>
+    /// HQInjector is the primary Dependency Injection class.
+    /// This class scans newly registered <see cref="HQCoreBehavior"/> instances for the [HQInject] tag, and looks for appropriate object instances that match type.
+    /// </summary>
     public sealed class HQInjector : HQCoreBehavior{
 
         //TODO: Injector flags in an injectormodel
@@ -25,34 +29,29 @@ namespace HQDotNet
         public bool Inject(HQCoreBehavior behavior){
             BehaviorCategory behaviorCategory = HQRegistry.GetBehaviorCategory(behavior.GetType());
 
-            ValidateInjectionRules(behavior);
+            //ValidateInjectionRules(behavior);
 
             foreach(Type existingControllerT in _registry.Controllers.Keys) {
                 if(behavior.GetType() == existingControllerT) {
                     continue;
                 }
                 switch (behaviorCategory) {
-
                     //Controller <--> Controller
                     case BehaviorCategory.Controller:
                         Inject(behavior, _registry.Controllers[existingControllerT]);
                         Inject(_registry.Controllers[existingControllerT], behavior);
                         break;
 
-                    //Controller <-!-> View
-                    case BehaviorCategory.View: break;
-
                     //Controller <-- Service
                     case BehaviorCategory.Service:
-                        //Testing, Controllers will not inject into services.
-                        //Services should do data validation and dispatching
-                        //Inject(behavior, _registry.Controllers[type]);
+                        //Controllers will not inject into services, but not the other way aroun
+                        //Services should either return a value or dispatch information
                         Inject(_registry.Controllers[existingControllerT], behavior);
                         break;
                 }
             }
 
-            //Service -> Controller, View
+            //Service -> Controller
             foreach(Type existingServiceT in _registry.Services.Keys) {
                 if (behavior.GetType() == existingServiceT) {
                     continue;
@@ -61,24 +60,6 @@ namespace HQDotNet
                     case BehaviorCategory.Controller:
                         Inject(behavior, _registry.Services[existingServiceT]);
                         break;
-                    case BehaviorCategory.View:
-                        Inject(behavior, _registry.Services[existingServiceT]);
-                        break;
-                }
-            }
-
-            //View <--> View
-            foreach (Type type in _registry.Views.Keys) {
-                foreach (var existingView in _registry.Views[type]) {
-                    if (behavior == existingView) {
-                        continue;
-                    }
-                    switch (behaviorCategory) {
-                        case BehaviorCategory.View:
-                            Inject(existingView, behavior);
-                            Inject(behavior, existingView);
-                            break;
-                    }
                 }
             }
 
@@ -149,25 +130,25 @@ namespace HQDotNet
                     continue;
                 }
 
-                var decaredFieldT = member.FieldType;// .ReflectedType;// .GetType();//.FieldType;
+                var decaredFieldT = member.FieldType;
 
 
                 switch (behaviorToInjectCategory) {
                     case BehaviorCategory.Controller:
-                        //1. Thou shalt not inject a Singleton Controller unto itself.
+                        //Do not inject a behavior into itself.
                         if (decaredFieldT == behaviorToInjectT)
                             throw new HQInjectionException("A behavior may not be injected into itself.");
 
-                        //2. Thou shalt not inject a View unto a Controller.
+                        //Do not directly inject a view into a controller
                         if (typeof(HQView).IsAssignableFrom(decaredFieldT))
-                            throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
+                            throw new HQInjectionException("Views may not be injected into other classes. They should communicate with Dispatches and IDispatchListeners.");
 
                         break;
 
                     case BehaviorCategory.Service:
 
-                        //3. Thou shalt pretect the sanctity of a Service: no behavior shall inject it.
-                        throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
+                        //Do not inject anything into a service
+                        throw new HQInjectionException("Services may not be injected with any other behaviours. They should be instructed by a controller, or sending dispatches.");
 
                     case BehaviorCategory.View:
 
@@ -175,15 +156,7 @@ namespace HQDotNet
                         if (decaredFieldT == behaviorToInjectT)
                             throw new HQInjectionException("A behavior may not be injected into itself.");
 
-                        //5. Thou shalt not inject a Controller unto a View.
-                        if (typeof(HQController).IsAssignableFrom(decaredFieldT))
-                            throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
-
                         break;
-
-                    default:
-                        //6. Thou shalt not enter the inner injection sanctum unless you are a Controller, Service, or View
-                        throw new HQInjectionException(behaviorToInjectT, decaredFieldT);
                 }
             }
         }
