@@ -92,6 +92,13 @@ namespace HQDotNet.Test {
             Assert.AreEqual(newText, classInstance.textToUpdate);
         }
 
+        [Test]
+        public void SubclassInjectionTest() {
+            var controller = _session.RegisterController<DummyModuleController>();
+            var service = _session.RegisterService<DummyModuleServiceInherited>();
+            Assert.IsTrue(controller.HasService());
+        }
+
         public void UnregisterControllerTest() {
 
         }

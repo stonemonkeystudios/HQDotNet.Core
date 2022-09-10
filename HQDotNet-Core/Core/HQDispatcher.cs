@@ -26,13 +26,6 @@ namespace HQDotNet
 
         //It would be nice for these to also be immediately injectable.[HQInject]
         private HQRegistry _registry;
-
-        private ConcurrentQueue<Action> _pendingDispatch;
-
-        public HQDispatcher() : base() {
-            _pendingDispatch = new ConcurrentQueue<Action>();
-        }
-
         public void SetRegistry(HQRegistry registry) {
             _registry = registry;
         }
@@ -68,46 +61,10 @@ namespace HQDotNet
             }
         }
 
-        public void UnregisterDispatchListenerInterface<TListener>(TListener listener)
-            where TListener : IDispatchListener {
-
-            _registry.UnbindBehaviorListenerForObject(listener);
-        }
-
-        public delegate Action DispatchMessageDelegate<TDispatchListener>(TDispatchListener dispatchListener);
-        public void Dispatch<TDispatchListener>(DispatchMessageDelegate<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
-
-            //Immediate dispatch
-
-            var listeners = _registry.GetDispatchListenersForType<TDispatchListener>();
-            foreach (var listener in listeners) {
-
-                //dispatchMessage((TDispatchListener)listener);
-                //continue;
-
-                //Delayed
-                lock (_pendingDispatch) {
-                    _pendingDispatch.Enqueue(dispatchMessage((TDispatchListener)listener));
-                }
-            }
-        }
-
         public void Dispatch<TDispatchListener>(Action<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
             var listeners = GetListeners<TDispatchListener>();
             foreach(var listener in listeners) {
                 dispatchMessage(listener);
-            }
-        }
-
-        //[MethodImpl(MethodImplOptions.Synchronized)]
-        private void ExecuteDispatchQueue() {
-            lock (_pendingDispatch) {
-                Action dequeuedAction;
-                if (_pendingDispatch != null) {
-                    while (_pendingDispatch.TryDequeue(out dequeuedAction)) {
-                        dequeuedAction();
-                    }
-                }
             }
         }
 
@@ -120,18 +77,7 @@ namespace HQDotNet
             return valid;
         }
 
-        private static bool ValidateDispatcherRules(Type interfaceType, Type behaviorType) {
-            /*
-             * We can use this before registering a behavior to validate Interfaces
-             *      -Views can't implement IServiceListener for example
-             */
-
-            return true;
-        }
-
         public override void LateUpdate() {
-
-            ExecuteDispatchQueue();
 
             base.LateUpdate();
         }

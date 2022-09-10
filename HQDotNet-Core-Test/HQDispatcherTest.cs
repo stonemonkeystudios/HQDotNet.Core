@@ -74,6 +74,31 @@ namespace HQDotNet.Test {
             Assert.AreEqual(dummyTitleString, view.DisplayString);
         }
 
+        [Test]
+        public void UnregisterTest() {
+            var view = _session.RegisterView<DummyModuleView>();
+            Assert.IsNull(view.DisplayString);
+            _session.Dispatcher.Dispatch<IModelListener<DummyData>>(listener => listener.OnModelUpdated(new DummyData() { title = "Title" }));
+            Assert.AreEqual("Title", view.DisplayString);
+            _session.Unregister(view);
+            _session.Dispatcher.Dispatch<IModelListener<DummyData>>(listener => listener.OnModelUpdated(new DummyData() { title = "" }));
+            Assert.AreEqual("Title", view.DisplayString);
+        }
+
+        [Test]
+        public void UnregisterWithNoListenersTest() {
+            //Controller has no interfaces, so if we unregister it, nothing should change in the dispatcher
+            var controller = _session.RegisterController<DummyModuleController>();
+            Assert.DoesNotThrow(() => {
+                _session.Unregister(controller);
+            });
+        }
+
+        [Test]
+        public void UnregisterInterfaceOnly() {
+            //Register a controller with two interfaces
+        }
+
 
         #region Non-HQ Tests
 
@@ -166,24 +191,11 @@ namespace HQDotNet.Test {
         }
 
         protected void DispatchNonHQRegistrationTest(int newInt) {
-
-            Action dispatchMessage(INonHQDispatchTest hubListener) {
-                return () => hubListener.DispatchAction(newInt);
-            }
-            var dispatchDelegate = (HQDispatcher.DispatchMessageDelegate<INonHQDispatchTest>)dispatchMessage;
-
-            _session.Dispatcher.Dispatch(dispatchDelegate);
+            _session.Dispatcher.Dispatch<INonHQDispatchTest>(listener => listener.DispatchAction(newInt));
         }
 
         protected void DispatchNonHQRegistrationTestString(string newString){
-
-
-            Action dispatchMessage(INonHQDispatchTestString hubListener) {
-                return () => hubListener.DispatchAction(newString);
-            }
-            var dispatchDelegate = (HQDispatcher.DispatchMessageDelegate<INonHQDispatchTestString>)dispatchMessage;
-
-            _session.Dispatcher.Dispatch(dispatchDelegate);
+            _session.Dispatcher.Dispatch<INonHQDispatchTestString>(listener=>listener.DispatchAction(newString));
         }
 
         #endregion

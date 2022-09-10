@@ -194,6 +194,7 @@ namespace HQDotNet
         private bool InjectionMemberFilter(MemberInfo memberInfo, object filterCriteria) {
             Type injectorType = (Type)filterCriteria;
             //bool success = ((FieldInfo)memberInfo).FieldType == injectorType;
+            //bool success = injectorType.IsAssignableFrom(((FieldInfo)memberInfo).FieldType);
             bool success = ((FieldInfo)memberInfo).FieldType.IsAssignableFrom(injectorType);
             return success;
         }
