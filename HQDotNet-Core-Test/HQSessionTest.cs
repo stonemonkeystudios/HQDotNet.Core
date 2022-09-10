@@ -64,6 +64,34 @@ namespace HQDotNet.Test {
 
         }
 
+        [Test]
+        public void RegisterControllerTest() {
+            var controller1 = _session.RegisterController<DummyModuleController>();
+            var controller2 = _session.RegisterController<DummyModuleController2>();
+            Assert.True(controller1.HasController());
+            Assert.True(controller2.HasController());
+        }
+
+        [Test]
+        public void RegisterServiceTest() {
+            var controller1 = _session.RegisterController<DummyModuleController>();
+            var service = _session.RegisterService<DummyModuleService>();
+            Assert.True(controller1.HasService());
+        }
+
+        [Test]
+        public void RegisterForDispatchOnlyTest() {
+            string newText = "newText";
+            DummyNonHQClass classInstance = new DummyNonHQClass();
+            Assert.AreEqual("", classInstance.textToUpdate);
+            _session.RegisterObjectOnlyForDispatch(classInstance);
+            _session.Startup();
+            _session.Dispatcher.Dispatch<IDummyListener>(listener => listener.UpdateText(newText));
+            _session.Update();
+            _session.LateUpdate();
+            Assert.AreEqual(newText, classInstance.textToUpdate);
+        }
+
         public void UnregisterControllerTest() {
 
         }

@@ -36,15 +36,15 @@ namespace HQDotNet.Test {
          * Valid
          * Y Controller->Controller
          * Y Service->Controller
-         * Y Service->View
-         * Y View->View
          * 
          * Invalid
          * N Controller->Service
          * N Controller->View
          * N Service->Service
+         * N Service->View
          * N View->Controller
          * N View->Service
+         * N View->View
          */
 
         [Test]
@@ -76,8 +76,17 @@ namespace HQDotNet.Test {
             Assert.True(controller.HasService());
         }
 
+        public void InvalidInjection_SelfInjection() {
+
+        }
+
+        public void InvalidInjection_ServiceIntoService() {
+
+        }
+
+
         [Test]
-        public void ValidInjection_ServiceIntoView() {
+        public void InvalidInjection_ServiceIntoView() {
             var view = new DummyModuleView();
             var service = new DummyModuleService();
 
@@ -87,12 +96,12 @@ namespace HQDotNet.Test {
             _injector.Inject(view);
             _injector.Inject(service);
 
-            Assert.True(view.HasService());
+            Assert.False(view.HasService());
 
         }
 
         [Test]
-        public void ValidInjection_ViewIntoView() {
+        public void InvalidInjection_ViewIntoView() {
             var view = new DummyModuleView();
             var view2 = new DummyModuleView2();
 
@@ -102,8 +111,8 @@ namespace HQDotNet.Test {
             _injector.Inject(view);
             _injector.Inject(view2);
 
-            Assert.True(view.HasView());
-            Assert.True(view2.HasView());
+            Assert.False(view.HasView());
+            Assert.False(view2.HasView());
         }
 
         [Test]
@@ -240,14 +249,6 @@ namespace HQDotNet.Test {
                 else if (typeof(DummyModuleController2).IsAssignableFrom(behavior.GetType())) {
                     Assert.IsTrue((behavior as DummyModuleController2).HasController());
                     Assert.IsTrue((behavior as DummyModuleController2).HasService());
-                }
-                else if (typeof(DummyModuleView).IsAssignableFrom(behavior.GetType())) {
-                    Assert.IsTrue((behavior as DummyModuleView).HasView());
-                    Assert.IsTrue((behavior as DummyModuleView).HasService());
-                }
-                else if (typeof(DummyModuleView2).IsAssignableFrom(behavior.GetType())) {
-                    Assert.IsTrue((behavior as DummyModuleView2).HasView());
-                    Assert.IsTrue((behavior as DummyModuleView2).HasService());
                 }
             }
         }

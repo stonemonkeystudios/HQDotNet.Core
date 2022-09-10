@@ -29,7 +29,7 @@ namespace HQDotNet
         public bool Inject(HQCoreBehavior behavior){
             BehaviorCategory behaviorCategory = HQRegistry.GetBehaviorCategory(behavior.GetType());
 
-            //ValidateInjectionRules(behavior);
+            ValidateInjectionRules(behavior);
 
             foreach(Type existingControllerT in _registry.Controllers.Keys) {
                 if(behavior.GetType() == existingControllerT) {
