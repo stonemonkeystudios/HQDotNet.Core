@@ -1,46 +1,30 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace HQDotNet.Unity
 {
-    public class HQPrefabCollectionView : HQMonoBehaviourCollectionView{
+    public class HQPrefabCollectionView : HQMonoView{
         public GameObject prefab;
+        public GameObject localObject;
+        protected Dictionary<object, HQMonoView> modelMonoViews = new Dictionary<object, HQMonoView>(); 
 
-        public override void OnModelAdded(ref object model) {
-            Assert.IsNotNull(model);
-
+        public GameObject Spawn() {
             GameObject go = Instantiate(prefab);
-            var monoView = go.GetComponent<HQMonoBehaviourView>();
+            var monoView = go.GetComponent<HQMonoView>();
             if (monoView == null) {
-                go.AddComponent<HQMonoBehaviourView>();
+                go.AddComponent<HQMonoView>();
             }
-            _modelViewBindings.Add(model, monoView);
-            monoView.UpdateModel(ref model);
-            Debug.Log("Added a new view for model named " + go.name);
-            base.OnModelAdded(ref model);
+            return go;
         }
 
-        public override void OnModelUpdated(ref object model) {
-            base.OnModelUpdated(ref model);
-            var monoView = _modelViewBindings[model];
-            if (monoView == null) {
+        public virtual void Dispose(object model) {
+            if (!modelMonoViews.ContainsKey(model)) {
+                Debug.LogError("Model to delete was not found.");
+                return;
             }
-
-            monoView.UpdateModel(ref model);
-
-        }
-
-        public override void OnModelDeleted(ref object model) {
-            Assert.IsNotNull(model);
-            Assert.IsTrue(_modelViewBindings.ContainsKey(model));
-
-            var monoView = _modelViewBindings[model];
-            Assert.IsNotNull(monoView);
-
-            _modelViewBindings.Remove(model);
-            Destroy(monoView);
-
-            base.OnModelDeleted(ref model);
+            Destroy(modelMonoViews[model].gameObject);
+            modelMonoViews.Remove(model);
         }
 
         private void Start() {
