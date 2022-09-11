@@ -12,7 +12,7 @@ When used with Unity, typically a session will be managed in a MonoBehaviour and
 
 The most basic HQSession implementation within Unity would look something like this.
 
-```
+```csharp
 using UnityEngine;
 using HQDotNet;
 
