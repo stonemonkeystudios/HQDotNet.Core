@@ -68,7 +68,60 @@ The base methods are:
 3. **LateUpdate()** - This is the same as Update, but will be called after all behaviors have been Updated for a frame. So all behaviors receive Update, and then all behaviors receive LateUpdate
 4. **Shutdown()** - This method allows you to execute any cleanup code before the behavior moves into a Shutdown state, where it no longer receives messages. This will be automatically called if the behavior type is unregistered from the session, or the session shuts down.
 
+## Registering an HQBehavior
+
+All behaviors you wish to incorporate with the HQ Environment must be registered with an HQSession. Within that HQSession, all registered behaviors will have one or both of Dispatcher Registration and Dependency Injection (Property-Based).
+
+A simple example of registering a number of components with an HQSession looks something like this. We'll take a look at the specific components involved later.
+
+```csharp
+using UnityEngine;
+using HQDotNet;
+
+public class DemoClass : MonoBehaviour{
+    //public MathMonoView mathMonoView;
+    public MathSettings _mathSettings;
+
+    private HQSession _session;
+
+    void Awake(){
+        _session = new HQSession();
+
+        //Register behaviors here
+        _session.RegisterController<MathController>();
+        _session.RegisterService<MathService>();
+        _session.RegisterView<MathView>();
+
+        //For a monobehavior view, we might use something like this.
+        //_session.RegisterObjectForDispatchOnly(mathMonoView);
+        
+        //Best practice for a Monobehaviour-based view is to inherit from HQDotNet.Unity.HQMonoView
+        //An HQMonoView will register itself automatically on awake with the HQViewMediator (which is created by the most recently created session. At the moment, for this reason, multiple sessions may not behave correctly.
+        
+        DispatchModelUpdates();
+    }
+
+    //Here we can dispatch initial model files to the HQ ecosystem. Anyone listening for this specific model to update will receive a dispatch indicating that new data has been updated.
+    //Frequently used for initial settings such as setting host and port for a web service.
+    void DispatchModelUpdates(){
+        _session.Dispatcher.Dispatch<IModelListener<MathSettings>>((listener)=>{
+            listener.OnModelUpdated(_mathSettings);
+        });
+    }
+
+    void Start()
+    ...
+}
+```
+
+
 ## HQ Behavior Types
+
+### HQController
+
+### HQService
+
+### HQView
 
 ## TODO
 There area number of things to cover here yet, and a number of things to cover in the codebase as well.
