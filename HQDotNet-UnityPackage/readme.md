@@ -20,7 +20,7 @@ By registering controllers, we're able to manage and organize game functionaliti
 
 ### Model Listeners and Dispatching
 
-HQDotNet uses listeners to observe changes in data models. You can implement the `IModelListener<T>` interface for any class that needs to respond to model updates:
+HQDotNet uses dispatch listeners to observe changes throughout the HQ ecosystem.. You can implement the `IModelListener<T>` interface for any class that needs to respond to model updates:
 
 ```csharp
 // Example from PongBallController.cs
