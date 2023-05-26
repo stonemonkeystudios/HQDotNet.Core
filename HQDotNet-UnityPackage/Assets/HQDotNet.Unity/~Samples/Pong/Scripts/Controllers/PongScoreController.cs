@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace HQDotNet.Unity.Pong {
-    public class PongScoreController : HQController, IModelListener<PongSettings> {
+    public class PongScoreController : HQController, IModelListener<PongSettings>, IGameOverButtonClickedListener {
 
         [HQInject]
         private PongStateController _stateController;
+
+        [HQInject]
+        private PongBallController _ballController;
 
         private PongSettings _settings;
 
@@ -20,6 +23,7 @@ namespace HQDotNet.Unity.Pong {
             else {
                 Player2Score++;
             }
+            _ballController.SetLastScoredPlayer(playerIndex);
             //Dispatch score update
             Session.Dispatcher.Dispatch<IPlayerScoredController>(listener => listener.PlayerScored(playerIndex, playerIndex == 0 ? Player1Score : Player2Score));
             CheckEndGame();
@@ -34,8 +38,23 @@ namespace HQDotNet.Unity.Pong {
             }
         }
 
+        void IGameOverButtonClickedListener.OnMainMenuButtonClicked() {
+            ClearScore();
+        }
+        void IGameOverButtonClickedListener.OnPlayAgainClicked() {
+            ClearScore();
+        }
+
+        void ClearScore() {
+            Player1Score = 0;
+            Player2Score = 0;
+            Session.Dispatcher.Dispatch<IPlayerScoredController>(listener => listener.PlayerScored(0, Player1Score));
+            Session.Dispatcher.Dispatch<IPlayerScoredController>(listener => listener.PlayerScored(1, Player2Score));
+        }
+
         void IModelListener<PongSettings>.OnModelUpdated(PongSettings model) {
             this._settings = model;
         }
+
     }
 }

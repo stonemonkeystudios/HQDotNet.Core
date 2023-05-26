@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 
 namespace HQDotNet.Unity.Pong {
-    public class PongStateController : HQController {
+    public class PongStateController : HQController, IGameOverButtonClickedListener {
         public enum PongState { Menu, WaitingToStart, Playing, GameOver, None };
 
         public PongState CurrentState { get { return currentState; } }
@@ -39,6 +39,14 @@ namespace HQDotNet.Unity.Pong {
                     await Task.Delay(System.TimeSpan.FromSeconds(1));
                 }
             }
+        }
+
+        void IGameOverButtonClickedListener.OnMainMenuButtonClicked() {
+            SetState(PongState.Menu);
+        }
+
+        void IGameOverButtonClickedListener.OnPlayAgainClicked() {
+            SetState(PongState.WaitingToStart);
         }
     }
 }

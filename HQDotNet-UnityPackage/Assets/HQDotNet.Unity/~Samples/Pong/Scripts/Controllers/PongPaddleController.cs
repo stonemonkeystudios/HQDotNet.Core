@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace HQDotNet.Unity.Pong {
-    public class PongPaddleController : HQController, IModelListener<PongSettings> {
+    public class PongPaddleController : HQController, IModelListener<PongSettings>, IGameOverButtonClickedListener {
         private float paddle1Position;
         private float paddle2Position;
         private PongSettings settings;
@@ -21,8 +21,23 @@ namespace HQDotNet.Unity.Pong {
             }
         }
 
+        void IGameOverButtonClickedListener.OnMainMenuButtonClicked() {
+            ResetPaddles();
+        }
+        void IGameOverButtonClickedListener.OnPlayAgainClicked() {
+            ResetPaddles();
+        }
+
+        private void ResetPaddles() {
+            paddle1Position = 0f;
+            paddle2Position = 0f;
+            Session.Dispatcher.Dispatch<IPaddleMovedListener>(listener => listener.PaddleMoved(0, paddle1Position));
+            Session.Dispatcher.Dispatch<IPaddleMovedListener>(listener => listener.PaddleMoved(1, paddle1Position));
+        }
+
         void IModelListener<PongSettings>.OnModelUpdated(PongSettings model) {
             this.settings = model;
         }
+
     }
 }
