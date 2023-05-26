@@ -14,6 +14,10 @@ namespace HQDotNet.Unity.Pong {
             //Register Controllers
             _session.RegisterController<PongBallController>();
             _session.RegisterController<PongStateController>();
+            _session.RegisterController<PongGoalController>();
+            _session.RegisterController<PongScoreController>();
+            _session.RegisterController<PongPaddleController>();
+            _session.RegisterController<PongInputController>();
 
             //Register Services
 

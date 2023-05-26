@@ -30,6 +30,12 @@ namespace HQDotNet.Unity.Pong {
                 SetVelocity(this.pongSettings.StartingBallSpeed);
                 SetTravelVector(new Vector2(-1f, .5f));
             }
+            else if(newState == PongStateController.PongState.WaitingToStart) {
+                SetVelocity(0f);
+                SetTravelVector(Vector2.zero);
+                currentBallPosition = Vector3.zero;
+                Session.Dispatcher.Dispatch<IPongBallPositionUpdatedListener>(listener => listener.BallPositionUpdated(currentBallPosition));
+            }
         }
 
         public override void Update() {

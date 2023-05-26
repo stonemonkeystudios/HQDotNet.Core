@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a072b5ab1c7ae49981d953ccefdf2d, type: 3}
   m_Name: PongSettings
   m_EditorClassIdentifier: 
+  winningScore: 3
   paddleSpeed: 5
+  startingBallSpeed: 5
+  maxPaddleYPosition: 5

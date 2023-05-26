@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 namespace HQDotNet.Unity.Pong {
-    public class PongGameUIView : HQMonoView, IPongStateChangedListener, IPongCountdownUpdatedListener {
+    public class PongGameUIView : HQMonoView, IPongStateChangedListener, IPongCountdownUpdatedListener, IPlayerScoredController {
         public Text player1Score;
         public Text player2Score;
         public Text countdown;
@@ -29,6 +29,15 @@ namespace HQDotNet.Unity.Pong {
             MainThreadSyncer.Instance.ExecuteOnMainThread(() => {
                 countdown.gameObject.SetActive(newState == PongStateController.PongState.WaitingToStart);
             });
+        }
+
+        void IPlayerScoredController.PlayerScored(int playerIndex, int currentScore) {
+            if(playerIndex == 0) {
+                player1Score.text = currentScore.ToString();
+            }
+            else {
+                player2Score.text = currentScore.ToString();
+            }
         }
     }
 }
