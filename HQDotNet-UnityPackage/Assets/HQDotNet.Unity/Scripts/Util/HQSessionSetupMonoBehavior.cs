@@ -3,11 +3,15 @@ using UnityEngine;
 namespace HQDotNet.Unity {
     public class HQSessionSetupMonoBehavior : MonoBehaviour {
         protected HQSession _session;
-        protected HQViewMediator _mediator;
 
         public virtual void Awake() {
             _session = new HQSession();
-            _mediator = new HQViewMediator(_session);
+            HQViewMediator.CreateInstance(_session);
+            MainThreadSyncer.CreateInstance();
+            var views = FindObjectsOfType<HQMonoView>(true);
+            foreach(var view in views) {
+                view.SetSession(_session);
+            }
         }
 
         public virtual void Start() {
@@ -26,9 +30,17 @@ namespace HQDotNet.Unity {
                 _session.LateUpdate();
         }
 
-        public virtual void OnApplicationQuit() {
+        public virtual void OnDestroy() {
+            if(MainThreadSyncer.Instance != null)
+                MainThreadSyncer.DestroyInstance();
+            if(HQViewMediator.Instance != null)
+                HQViewMediator.DestroyInstance();
             if (_session != null)
                 _session.Shutdown();
+            _session = null;
+        }
+
+        public virtual void OnApplicationQuit() {
         }
     }
 }

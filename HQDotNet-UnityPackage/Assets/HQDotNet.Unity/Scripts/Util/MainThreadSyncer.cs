@@ -10,19 +10,30 @@ public class MainThreadSyncer : MonoBehaviour
     private static MainThreadSyncer _instance;
     public static MainThreadSyncer Instance {
         get {
-            if(_instance == null) {
-                GameObject obj = new GameObject();
-                _instance = obj.AddComponent<MainThreadSyncer>();
-            }
             return _instance;
         }
     }
 
+    public static void CreateInstance() {
+        if (Application.isPlaying && _instance == null) {
+            GameObject obj = new GameObject("_MainThreadSyncer");
+            _instance = obj.AddComponent<MainThreadSyncer>();
+        }
+    }
+
+    public static void DestroyInstance() {
+        Destroy(_instance.gameObject);
+        _instance = null;
+    }
+
     public void Awake() {
         _unityMainThread = SynchronizationContext.Current;
+        DontDestroyOnLoad(gameObject);
     }
 
     public void ExecuteOnMainThread(System.Action action) {
-        _unityMainThread.Post((_)=>action(), null);
+        if (_unityMainThread != null) {
+            _unityMainThread.Post((_) => action(), null);
+        }
     }
 }
