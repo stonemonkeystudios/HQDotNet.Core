@@ -58,7 +58,6 @@ By using `[HQInject]`, we can easily access other controllers or services in our
 - `PongBallController`: Manages the ball's behavior and listens to various game state changes and button clicks.
 - `PongStateController`: Manages the state of the game and coordinates transitions between different game states.
 - `PongScoreController`: Manages players' scores, updates scores when a player scores a point, and checks if the game has reached its end.
-- More classes I can't be bothered to add right now, including views and interfaces. Sorry. I made ChatGPT do this, so I'd have to give it more data or do it on my own. Meh
 
 ### IDispatchListener Interface
 
