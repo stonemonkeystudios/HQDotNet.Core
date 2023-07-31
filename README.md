@@ -2,6 +2,9 @@
 # HQDotNet
 HQDotNet is a loose MVCS architectural framework. It's primary functionalities are Dependency Injection and Dispatch management.
 
+## NOTE
+For usage with Unity, please see the [Pong Tutorial](https://github.com/stonemonkeystudios/HQDotNet.Core/tree/dev/HQDotNet-UnityPackage)
+
 ## Architecture
 ### HQSession
 HQSession is the primary entry point for interaction with the HQ ecosystem.
