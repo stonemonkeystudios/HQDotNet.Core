@@ -42,6 +42,10 @@ namespace HQDotNet
             }
         }
 
+        public void UnregisterDispatchListenerInterface<TListener>(TListener behavior) where TListener : IDispatchListener {
+            _registry.UnbindBehaviorListenerForObject(behavior);
+        }
+
         public List<TListener> GetListeners<TListener>() where TListener : IDispatchListener{
             return _registry.GetDispatchListenersForType<TListener>();
         }

@@ -141,6 +141,34 @@ namespace HQDotNet {
             _registry.Unregister(behavior);
         }
 
+        public TBehavior GetService<TBehavior>()
+            where TBehavior : HQService{
+
+            foreach(var key in _registry.Services.Keys) {
+                if(typeof(TBehavior).IsAssignableFrom(key)){
+                //if (key.IsAssignableFrom(typeof(TBehavior))){
+                    return _registry.Services[key] as TBehavior;
+                }
+            }
+
+            return null;
+
+        }
+
+        public TBehavior GetController<TBehavior>()
+            where TBehavior : HQController{
+
+            foreach (var key in _registry.Controllers.Keys) {
+                //if(typeof(TBehavior).IsAssignableFrom(key))){
+                if (key.IsAssignableFrom(typeof(TBehavior))) {
+                    return _registry.Controllers[key] as TBehavior;
+                }
+            }
+
+            return null;
+
+        }
+
         #region HQBehavior Overrides
 
         /// <summary>

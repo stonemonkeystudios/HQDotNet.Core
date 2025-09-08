@@ -35,20 +35,9 @@ namespace HQDotNet
                 if(behavior.GetType() == existingControllerT) {
                     continue;
                 }
-                switch (behaviorCategory) {
-                    //Controller <--> Controller
-                    case BehaviorCategory.Controller:
-                        Inject(behavior, _registry.Controllers[existingControllerT]);
-                        Inject(_registry.Controllers[existingControllerT], behavior);
-                        break;
 
-                    //Controller <-- Service
-                    case BehaviorCategory.Service:
-                        //Controllers will not inject into services, but not the other way aroun
-                        //Services should either return a value or dispatch information
-                        Inject(_registry.Controllers[existingControllerT], behavior);
-                        break;
-                }
+                Inject(behavior, _registry.Controllers[existingControllerT]);
+                Inject(_registry.Controllers[existingControllerT], behavior);
             }
 
             //Service -> Controller
@@ -58,6 +47,7 @@ namespace HQDotNet
                 }
                 switch (behaviorCategory) {
                     case BehaviorCategory.Controller:
+                    case BehaviorCategory.Service:
                         Inject(behavior, _registry.Services[existingServiceT]);
                         break;
                 }
@@ -135,6 +125,7 @@ namespace HQDotNet
 
                 switch (behaviorToInjectCategory) {
                     case BehaviorCategory.Controller:
+                    case BehaviorCategory.Service:
                         //Do not inject a behavior into itself.
                         if (decaredFieldT == behaviorToInjectT)
                             throw new HQInjectionException("A behavior may not be injected into itself.");
@@ -144,11 +135,6 @@ namespace HQDotNet
                             throw new HQInjectionException("Views may not be injected into other classes. They should communicate with Dispatches and IDispatchListeners.");
 
                         break;
-
-                    case BehaviorCategory.Service:
-
-                        //Do not inject anything into a service
-                        throw new HQInjectionException("Services may not be injected with any other behaviours. They should be instructed by a controller, or sending dispatches.");
 
                     case BehaviorCategory.View:
 
