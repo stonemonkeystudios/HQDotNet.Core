@@ -1,4 +1,4 @@
-
+using HQDotNet.Model;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -6,7 +6,11 @@ namespace HQDotNet.Test {
 
     public class HQSessionTest {
 
+        private class DummyModuleControllerDerived : DummyModuleController {
+        }
+
         private HQSession _session;
+
         [SetUp]
         public void Setup() {
             _session = new HQSession();
@@ -23,7 +27,6 @@ namespace HQDotNet.Test {
         /// Demonstrates a basic example of the functionality of HQSession
         /// Shows the cooperative automation of the Registry, Injector, and Dispatcher
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async Task SimpleSessionTest() {
             string dummyTitleString = "DummyTitle";
@@ -31,19 +34,12 @@ namespace HQDotNet.Test {
             var view = _session.RegisterView<DummyModuleView>();
             _session.RegisterService<DummyModuleService>();
 
-            //View's display string is initially null
             Assert.IsNull(view.DisplayString);
 
-            //Query a test service that waits 50ms and then changes the data
-            //When the service is complete, a Dispatch is sent to all IModelData<DummyData>
-            //View is a listener, so will automatically receive the update
-            //Awaiting for simplicity sake, but this is async.
             await controller.QueryDummyDelayedServiceForData(dummyTitleString);
 
-            //Dispatches currently send in late update, to sync with main thread.
             _session.LateUpdate();
 
-            //View magically has the new display string
             Assert.AreEqual(dummyTitleString, view.DisplayString);
         }
 
@@ -54,10 +50,8 @@ namespace HQDotNet.Test {
             var view = _session.RegisterView<DummyModuleView>();
             _session.RegisterService<DummyModuleService>();
 
-
             for (int i = 0; i < 10000; i++) {
                 await controller.QueryDummyImmediateServiceForData(dummyTitleString + "_" + i);
-                //Dispatches currently send in late update, to sync with main thread.
                 _session.LateUpdate();
                 Assert.AreEqual(dummyTitleString + "_" + i, view.DisplayString);
             }
@@ -75,8 +69,139 @@ namespace HQDotNet.Test {
         [Test]
         public void RegisterServiceTest() {
             var controller1 = _session.RegisterController<DummyModuleController>();
-            var service = _session.RegisterService<DummyModuleService>();
+            _session.RegisterService<DummyModuleService>();
             Assert.True(controller1.HasService());
+        }
+
+        [Test]
+        public void RegisterController_BeforeStartup_IsInitializedAndAvailable() {
+            var session = new HQSession();
+
+            var controller = session.RegisterController<DummyModuleController>();
+
+            Assert.AreEqual(HQPhase.Initialized, controller.Phase);
+            Assert.AreSame(controller, session.GetController<DummyModuleController>());
+
+            session.Shutdown();
+        }
+
+        [Test]
+        public void RegisterController_AfterStartup_IsInitializedAndAvailable() {
+            var controller = _session.RegisterController<DummyModuleController>();
+
+            Assert.AreEqual(HQPhase.Initialized, controller.Phase);
+            Assert.AreSame(controller, _session.GetController<DummyModuleController>());
+        }
+
+        [Test]
+        public void RegisterService_BeforeStartup_IsInitializedAndAvailable() {
+            var session = new HQSession();
+
+            var service = session.RegisterService<DummyModuleService>();
+
+            Assert.AreEqual(HQPhase.Initialized, service.Phase);
+            Assert.AreSame(service, session.GetService<DummyModuleService>());
+
+            session.Shutdown();
+        }
+
+        [Test]
+        public void RegisterService_AfterStartup_IsInitializedAndAvailable() {
+            var service = _session.RegisterService<DummyModuleService>();
+
+            Assert.AreEqual(HQPhase.Initialized, service.Phase);
+            Assert.AreSame(service, _session.GetService<DummyModuleService>());
+        }
+
+        [Test]
+        public void RegisterView_BeforeStartup_IsInitializedAndRegisteredAsDispatchListener() {
+            var session = new HQSession();
+
+            var view = session.RegisterView<DummyModuleView>();
+
+            Assert.AreEqual(HQPhase.Initialized, view.Phase);
+            Assert.Contains(view, session.Dispatcher.GetListeners<IModelListener<DummyData>>());
+
+            session.Shutdown();
+        }
+
+        [Test]
+        public void RegisterView_AfterStartup_IsInitializedAndRegisteredAsDispatchListener() {
+            var view = _session.RegisterView<DummyModuleView>();
+
+            Assert.AreEqual(HQPhase.Initialized, view.Phase);
+            Assert.Contains(view, _session.Dispatcher.GetListeners<IModelListener<DummyData>>());
+        }
+
+        [Test]
+        public void RegisterController_DuplicateRegistration_ReturnsNull() {
+            var firstController = _session.RegisterController<DummyModuleController>();
+
+            var secondController = _session.RegisterController<DummyModuleController>();
+
+            Assert.NotNull(firstController);
+            Assert.IsNull(secondController);
+        }
+
+        [Test]
+        public void RegisterService_DuplicateRegistration_ReturnsNull() {
+            var firstService = _session.RegisterService<DummyModuleService>();
+
+            var secondService = _session.RegisterService<DummyModuleService>();
+
+            Assert.NotNull(firstService);
+            Assert.IsNull(secondService);
+        }
+
+        [Test]
+        public void RegisterView_DuplicateTypeRegistration_ReturnsDistinctInstances() {
+            var firstView = _session.RegisterView<DummyModuleView>();
+            var secondView = _session.RegisterView<DummyModuleView>();
+
+            Assert.NotNull(firstView);
+            Assert.NotNull(secondView);
+            Assert.AreNotSame(firstView, secondView);
+            Assert.AreEqual(2, _session.Dispatcher.GetListeners<IModelListener<DummyData>>().Count);
+        }
+
+        [Test]
+        public void GetService_ExactAndSupertypeRequests_ReturnRegisteredSubtype() {
+            var registeredService = _session.RegisterService<DummyModuleServiceInherited>();
+
+            var exactTypeLookup = _session.GetService<DummyModuleServiceInherited>();
+            var supertypeLookup = _session.GetService<DummyModuleService>();
+
+            Assert.AreSame(registeredService, exactTypeLookup);
+            Assert.AreSame(registeredService, supertypeLookup);
+        }
+
+        [Test]
+        public void GetService_SubtypeRequestAgainstRegisteredBase_ReturnsNull() {
+            _session.RegisterService<DummyModuleService>();
+
+            var subtypeLookup = _session.GetService<DummyModuleServiceInherited>();
+
+            Assert.IsNull(subtypeLookup);
+        }
+
+        [Test]
+        public void GetController_ExactRequest_ReturnsRegisteredInstance() {
+            var registeredController = _session.RegisterController<DummyModuleController>();
+
+            var lookup = _session.GetController<DummyModuleController>();
+
+            Assert.AreSame(registeredController, lookup);
+        }
+
+        [Test]
+        public void GetController_SubtypeAndSupertypeRequests_ReturnNull() {
+            _session.RegisterController<DummyModuleController>();
+
+            var subtypeLookup = _session.GetController<DummyModuleControllerDerived>();
+            var supertypeLookup = _session.GetController<HQController>();
+
+            Assert.IsNull(subtypeLookup);
+            Assert.IsNull(supertypeLookup);
         }
 
         [Test]
@@ -95,12 +220,47 @@ namespace HQDotNet.Test {
         [Test]
         public void SubclassInjectionTest() {
             var controller = _session.RegisterController<DummyModuleController>();
-            var service = _session.RegisterService<DummyModuleServiceInherited>();
+            _session.RegisterService<DummyModuleServiceInherited>();
             Assert.IsTrue(controller.HasService());
         }
 
-        public void UnregisterControllerTest() {
+        [Test]
+        public void Unregister_RemovesInjectedReferencesAndDispatchListeners() {
+            var controller = _session.RegisterController<DummyModuleController>();
+            var service = _session.RegisterService<DummyModuleService>();
+            var view = _session.RegisterView<DummyModuleView>();
 
+            Assert.IsTrue(controller.HasService());
+            Assert.IsTrue(view.HasService());
+            Assert.AreEqual(1, _session.Dispatcher.GetListeners<IModelListener<DummyData>>().Count);
+
+            _session.Unregister(service);
+
+            Assert.IsFalse(controller.HasService());
+            Assert.IsFalse(view.HasService());
+            Assert.IsNull(_session.GetService<DummyModuleService>());
+
+            _session.Dispatcher.Dispatch<IModelListener<DummyData>>(listener => listener.OnModelUpdated(new DummyData() { title = "before unregister" }));
+            Assert.AreEqual("before unregister", view.DisplayString);
+
+            _session.Unregister(view);
+
+            Assert.AreEqual(0, _session.Dispatcher.GetListeners<IModelListener<DummyData>>().Count);
+            _session.Dispatcher.Dispatch<IModelListener<DummyData>>(listener => listener.OnModelUpdated(new DummyData() { title = "after unregister" }));
+            Assert.AreEqual("before unregister", view.DisplayString);
+        }
+
+        [Test]
+        public void UnregisterController_RemovesControllerAndUninjectsDependents() {
+            var controller = _session.RegisterController<DummyModuleController>();
+            var dependentController = _session.RegisterController<DummyModuleController2>();
+
+            Assert.IsTrue(dependentController.HasController());
+
+            _session.Unregister(controller);
+
+            Assert.IsNull(_session.GetController<DummyModuleController>());
+            Assert.IsFalse(dependentController.HasController());
         }
     }
 }

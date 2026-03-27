@@ -68,10 +68,20 @@ namespace HQDotNet.Test {
 
             await controller.QueryDummyImmediateServiceForData(dummyTitleString);
 
-            //Actually dispatch occurs on main thread in LateUpdate
             _session.Dispatcher.LateUpdate();
 
             Assert.AreEqual(dummyTitleString, view.DisplayString);
+        }
+
+        [Test]
+        public void Dispatch_WhenCalled_UpdatesListenerStateImmediately() {
+            var view = _session.RegisterView<DummyModuleView>();
+
+            Assert.IsNull(view.DisplayString);
+
+            _session.Dispatcher.Dispatch<IModelListener<DummyData>>(listener => listener.OnModelUpdated(new DummyData() { title = "Immediate Title" }));
+
+            Assert.AreEqual("Immediate Title", view.DisplayString);
         }
 
         [Test]
