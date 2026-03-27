@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using HQDotNet;
 
@@ -10,11 +8,21 @@ namespace HQDotNet.Unity
         protected HQSession _session;
 
         /// <summary>
-        /// If this view has not been registered with HQ yet, register it via the HQViewMediator
+        /// If this view has not been registered with HQ yet, register it via the active HQ context root.
+        /// Falls back to the legacy HQViewMediator compatibility path when needed.
         /// </summary>
         protected virtual void Awake() {
-            if (HQViewMediator.Instance != null && _session == null) {
-                HQViewMediator.Instance.RegisterMonoView(this);
+            if (_session != null) {
+                return;
+            }
+
+            if (HQContextRootMonoBehaviour.TryGetActive(out var contextRoot)) {
+                contextRoot.RegisterMonoView(this);
+                return;
+            }
+
+            if (HQContextRootMonoBehaviour.TryGetLegacySession(out var legacySession)) {
+                SetSession(legacySession);
             }
         }
 
