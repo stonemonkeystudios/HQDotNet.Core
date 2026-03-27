@@ -262,5 +262,31 @@ namespace HQDotNet.Test {
             Assert.IsNull(_session.GetController<DummyModuleController>());
             Assert.IsFalse(dependentController.HasController());
         }
+
+        [Test]
+        public void RuntimeContextInterface_RegisterAndLookupController_Works() {
+            IHQRuntimeContext runtimeContext = new HQSession();
+
+            var controller = runtimeContext.RegisterController<DummyModuleController>();
+            var lookup = runtimeContext.GetController<DummyModuleController>();
+
+            Assert.NotNull(controller);
+            Assert.AreSame(controller, lookup);
+
+            (runtimeContext as HQSession).Shutdown();
+        }
+
+        [Test]
+        public void RuntimeContextInterface_RegisterAndLookupService_Works() {
+            IHQRuntimeContext runtimeContext = new HQSession();
+
+            var service = runtimeContext.RegisterService<DummyModuleService>();
+            var lookup = runtimeContext.GetService<DummyModuleService>();
+
+            Assert.NotNull(service);
+            Assert.AreSame(service, lookup);
+
+            (runtimeContext as HQSession).Shutdown();
+        }
     }
 }
