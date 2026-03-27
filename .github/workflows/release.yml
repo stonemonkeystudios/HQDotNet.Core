@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (LTS)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Pack NuGet packages
+        run: |
+          mkdir -p artifacts/nuget
+          dotnet pack HQDotNet-Core/HQDotNet-Core.csproj -c Release --no-build -o artifacts/nuget
+          dotnet pack HQDotNet-Model/HQDotNet-Model.csproj -c Release --no-build -o artifacts/nuget
+
+      - name: Publish NuGet packages
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "artifacts/nuget/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Build Unity package artifact
+        run: |
+          mkdir -p artifacts/unity
+          tar -czf artifacts/unity/HQDotNet.Unity.${{ github.ref_name }}.tgz -C HQDotNet-UnityPackage/Assets HQDotNet.Unity
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/nuget/*.nupkg
+            artifacts/unity/HQDotNet.Unity.${{ github.ref_name }}.tgz
