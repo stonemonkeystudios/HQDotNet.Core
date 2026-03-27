@@ -18,15 +18,15 @@ namespace HQDotNet
      * 
      */
 
-    public sealed class HQDispatcher : HQCoreBehavior{
+    public sealed class HQDispatcher : HQCoreBehavior, IHQDispatcher{
 
         //TODO: Dispatcher should queue up all dispatches to be executed in a (new) LateUpdate method.
         //Any other threads that need to dispatch should register here and will be dispatched later
         //What sort of design implications does this have?
 
         //It would be nice for these to also be immediately injectable.[HQInject]
-        private HQRegistry _registry;
-        public void SetRegistry(HQRegistry registry) {
+        private IHQRegistry _registry;
+        public void SetRegistry(IHQRegistry registry) {
             _registry = registry;
         }
 

@@ -10,7 +10,7 @@ using HQDotNet.Model;
  */
 
 namespace HQDotNet {
-    public sealed class HQRegistry : HQCoreBehavior{
+    public sealed class HQRegistry : HQCoreBehavior, IHQRegistry{
 
         public Dictionary<Type, HQController> Controllers { get; private set; }
         public Dictionary<Type, HQService> Services { get; private set; }

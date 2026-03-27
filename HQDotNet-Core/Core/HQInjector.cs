@@ -11,14 +11,14 @@ namespace HQDotNet
     /// HQInjector is the primary Dependency Injection class.
     /// This class scans newly registered <see cref="HQCoreBehavior"/> instances for the [HQInject] tag, and looks for appropriate object instances that match type.
     /// </summary>
-    public sealed class HQInjector : HQCoreBehavior{
+    public sealed class HQInjector : HQCoreBehavior, IHQInjector{
 
         //TODO: Injector flags in an injectormodel
         const BindingFlags INJECT_BINDING_FLAGS = BindingFlags.NonPublic | BindingFlags.Instance;
 
-        private HQRegistry _registry;
+        private IHQRegistry _registry;
 
-        public void SetRegistry(HQRegistry registry) {
+        public void SetRegistry(IHQRegistry registry) {
             _registry = registry;
         }
 

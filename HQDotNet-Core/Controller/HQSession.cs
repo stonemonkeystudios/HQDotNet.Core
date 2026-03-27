@@ -9,7 +9,7 @@ namespace HQDotNet {
     /// The three primary classes that are regulated here are <see cref="HQInjector"/>, <see cref="HQRegistry"/>, and <see cref="HQDispatcher"/>
     /// </summary>
     /// 
-    public class HQSession : HQCoreBehavior{
+    public class HQSession : HQCoreBehavior, IHQRuntimeContext{
         /// <summary>
         /// Dispatcher is responsible for observing registered classes' interface implementation and delivering messages accordingly
         /// </summary>
@@ -60,6 +60,7 @@ namespace HQDotNet {
         /// The current session instance's Dispatcher. Used for circulating messages throughout the app
         /// </summary>
         public HQDispatcher Dispatcher { get { return _dispatcher; } }
+        IHQDispatcher IHQRuntimeContext.Dispatcher { get { return _dispatcher; } }
 
         /// <summary>
         /// Create, inject, and register a singleton behavior for a type of Controller 
@@ -329,4 +330,3 @@ namespace HQDotNet {
 
     }
 }
-
