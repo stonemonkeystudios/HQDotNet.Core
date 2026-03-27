@@ -1,0 +1,43 @@
+name: Dev Build
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_call:
+
+jobs:
+  build-test-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (LTS)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Package build artifacts
+        run: |
+          mkdir -p artifacts/build
+          dotnet publish HQDotNet-Core/HQDotNet-Core.csproj -c Release -o artifacts/build/HQDotNet-Core
+          dotnet publish HQDotNet-Model/HQDotNet-Model.csproj -c Release -o artifacts/build/HQDotNet-Model
+          tar -czf artifacts/dev-build-${{ github.sha }}.tar.gz -C artifacts/build .
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-build-${{ github.sha }}
+          path: artifacts/dev-build-${{ github.sha }}.tar.gz
+          if-no-files-found: error

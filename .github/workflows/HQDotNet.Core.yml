@@ -1,25 +1,18 @@
-name: .NET
+name: .NET (Compatibility Wrapper)
 
 on:
   push:
-    branches: [ dev ]
+    branches:
+      - dev
   pull_request:
-    branches: [ dev ]
+    branches:
+      - dev
 
 jobs:
-  build:
+  pr-validation:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/pr-validation.yml
 
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+  dev-build:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    uses: ./.github/workflows/dev-build.yml
