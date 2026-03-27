@@ -74,12 +74,26 @@ namespace HQDotNet.Test {
         }
 
         [Test]
-        public void Dispatch_WhenCalled_UpdatesListenerStateImmediately() {
+        public void Dispatch_WhenCalled_UpdatesListenerStateAtDispatchCallTime() {
             var view = _session.RegisterView<DummyModuleView>();
 
             Assert.IsNull(view.DisplayString);
 
             _session.Dispatcher.Dispatch<IModelListener<DummyData>>(listener => listener.OnModelUpdated(new DummyData() { title = "Immediate Title" }));
+
+            Assert.AreEqual("Immediate Title", view.DisplayString);
+        }
+
+        [Test]
+        public void LateUpdate_AfterImmediateDispatch_DoesNotAlterAlreadyDispatchedOutcome() {
+            var view = _session.RegisterView<DummyModuleView>();
+
+            Assert.IsNull(view.DisplayString);
+
+            _session.Dispatcher.Dispatch<IModelListener<DummyData>>(listener => listener.OnModelUpdated(new DummyData() { title = "Immediate Title" }));
+            Assert.AreEqual("Immediate Title", view.DisplayString);
+
+            _session.Dispatcher.LateUpdate();
 
             Assert.AreEqual("Immediate Title", view.DisplayString);
         }

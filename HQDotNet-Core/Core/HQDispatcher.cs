@@ -7,22 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace HQDotNet
 {
-    /*
-     * TODO: If we want to be able to thread behaviors, Dispatching should send on the main thread
-     * Or store until a given syncronization point.
-     * In this case, Dispatcher could actually be a behavior and syncing would be done in the update function
-     * 
-     * TODO: Dispatcher needs 
-     * 
-     * 
-     * 
-     */
-
     public sealed class HQDispatcher : HQCoreBehavior, IHQDispatcher{
-
-        //TODO: Dispatcher should queue up all dispatches to be executed in a (new) LateUpdate method.
-        //Any other threads that need to dispatch should register here and will be dispatched later
-        //What sort of design implications does this have?
 
         //It would be nice for these to also be immediately injectable.[HQInject]
         private IHQRegistry _registry;
@@ -65,6 +50,14 @@ namespace HQDotNet
             }
         }
 
+        /// <summary>
+        /// Dispatches to currently registered listeners immediately and synchronously on the calling thread.
+        /// </summary>
+        /// <typeparam name="TDispatchListener">The listener interface type to dispatch to.</typeparam>
+        /// <param name="dispatchMessage">The action executed for each registered listener right away during this call.</param>
+        /// <remarks>
+        /// Current behavior is immediate invocation; no queueing or delayed execution is performed here.
+        /// </remarks>
         public void Dispatch<TDispatchListener>(Action<TDispatchListener> dispatchMessage) where TDispatchListener : IDispatchListener {
             var listeners = GetListeners<TDispatchListener>();
             foreach(var listener in listeners) {
